@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alumni Registration</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      background-image: 
+        linear-gradient(135deg, rgba(5, 150, 105, 0.9) 0%, rgba(4, 120, 87, 0.9) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='grad2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23059669;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23047857;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad2)' width='1200' height='800'/%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+      color: #333;
+      padding: 20px;
+    }
+
+    .container {
+      padding: 40px;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.97);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .heading {
+      font-size: 1.8rem;
+      margin-bottom: 24px;
+      font-weight: 700;
+      color: #059669;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .input-field {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-field label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .input-field input {
+      padding: 11px 12px;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      background-color: #f9fafb;
+      color: #1f2937;
+      transition: all 0.3s;
+    }
+
+    .input-field input:focus {
+      border-color: #059669;
+      outline: none;
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+    }
+
+    .input-field input::placeholder {
+      color: #d1d5db;
+    }
+
+    .btn {
+      padding: 11px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #059669;
+      color: white;
+      transition: all 0.3s;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background-color: #047857;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .acc-text {
+      font-size: 0.85rem;
+      margin-top: 16px;
+      color: #6b7280;
+    }
+
+    .acc-text span {
+      color: #059669;
+      cursor: pointer;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .acc-text span:hover {
+      color: #047857;
+      text-decoration: underline;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      font-size: 0.8rem;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .form-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-section.full {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 480px) {
+      .form-section {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 24px;
+        max-width: 100%;
+      }
+
+      .heading {
+        font-size: 1.5rem;
+        margin-bottom: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="heading">Alumni Registration</h2>
+    <form class="form" id="alumniRegisterForm" novalidate>
+      <!-- Essential Fields -->
+      <div class="form-section full">
+        <div class="input-field">
+          <label for="name">Full Name *</label>
+          <input required type="text" name="fullName" id="name" placeholder="John Doe" />
+          <div class="error-msg" id="nameError"></div>
+        </div>
+      </div>
+
+      <div class="form-section full">
+        <div class="input-field">
+          <label for="email">Email Address *</label>
+          <input required type="email" name="email" id="email" placeholder="you@example.com" />
+          <div class="error-msg" id="emailError"></div>
+        </div>
+      </div>
+
+      <!-- Password Fields -->
+      <div class="form-section">
+        <div class="input-field">
+          <label for="password">Password *</label>
+          <input required type="password" name="password" id="password" placeholder="••••••••" />
+          <div class="error-msg" id="passwordError"></div>
+        </div>
+        <div class="input-field">
+          <label for="confirmPassword">Confirm Password *</label>
+          <input required type="password" name="confirmPassword" id="confirmPassword" placeholder="••••••••" />
+          <div class="error-msg" id="confirmError"></div>
+        </div>
+      </div>
+
+      <!-- Professional Info -->
+      <div class="form-section">
+        <div class="input-field">
+          <label for="graduation-year">Graduation Year *</label>
+          <input required type="number" name="graduationYear" id="graduation-year" placeholder="2020" min="1990" max="2050" />
+        </div>
+        <div class="input-field">
+          <label for="profession">Current Profession *</label>
+          <input required type="text" name="profession" id="profession" placeholder="Software Engineer" />
+        </div>
+      </div>
+
+      <!-- Optional Fields -->
+      <div class="form-section">
+        <div class="input-field">
+          <label for="batch">Batch</label>
+          <input type="text" name="batch" id="batch" placeholder="Batch of 2020" />
+        </div>
+        <div class="input-field">
+          <label for="company-name">Company Name</label>
+          <input type="text" name="companyName" id="company-name" placeholder="Tech Corp" />
+        </div>
+      </div>
+
+      <div class="form-section full">
+        <div class="input-field">
+          <label for="working-field">Working Field</label>
+          <input type="text" name="workingField" id="working-field" placeholder="Technology, Finance, etc." />
+        </div>
+      </div>
+
+      <button class="btn" type="submit">Create Account</button>
+      <div class="error-msg" id="formError"></div>
+    </form>
+
+    <div class="acc-text">
+      Already have an account?
+      <span onclick="window.location.href='alumnilogin.html'">Sign In</span>
+    </div>
+  </div>
+
+<script src="config.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const API_BASE = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+    const registerForm = document.getElementById('alumniRegisterForm');
+    const formErrorEl = document.getElementById('formError');
+
+    if (registerForm) {
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        formErrorEl.style.display = 'none';
+        formErrorEl.textContent = '';
+
+        // Validate form
+        const fullName = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const graduationYear = document.getElementById('graduation-year').value;
+        const profession = document.getElementById('profession').value.trim();
+
+        if (!fullName || !email || !password || !confirmPassword || !graduationYear || !profession) {
+          formErrorEl.textContent = 'Please fill in all required fields (marked with *)';
+          formErrorEl.style.display = 'block';
+          return;
+        }
+
+        if (password.length < 6) {
+          formErrorEl.textContent = 'Password must be at least 6 characters long';
+          formErrorEl.style.display = 'block';
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          formErrorEl.textContent = 'Passwords do not match';
+          formErrorEl.style.display = 'block';
+          return;
+        }
+
+        const submitBtn = registerForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating Account...';
+
+        try {
+          const response = await fetch(`${API_BASE}/api/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fullName,
+              email,
+              password,
+              graduationYear: parseInt(graduationYear),
+              profession,
+              batch: document.getElementById('batch').value.trim() || undefined,
+              workingField: document.getElementById('working-field').value.trim() || undefined,
+              companyName: document.getElementById('company-name').value.trim() || undefined,
+              userType: 'alumni'
+            })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            alert('Account created successfully! Please log in.');
+            window.location.href = 'alumnilogin.html';
+          } else {
+            formErrorEl.textContent = data.message || 'Registration failed. Please try again.';
+            formErrorEl.style.display = 'block';
+          }
+        } catch (error) {
+          formErrorEl.textContent = 'Network error. Please check your connection.';
+          formErrorEl.style.display = 'block';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create Account';
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

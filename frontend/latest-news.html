@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Updates | Student Feed</title>
+    <style>
+        /* CSS COMBINED & MODERNIZED */
+        :root {
+            --primary-dark: #2c3e50;
+            --accent-blue: #3498db;
+            --student-green: #2ecc71;
+            --bg-gray: #f8f9fa;
+            --white: #ffffff;
+            --text-main: #34495e;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+        body { display: flex; background: var(--bg-gray); min-height: 100vh; color: var(--text-main); }
+
+        /* Sidebar - Consistent with Student Dashboard */
+        .sidebar {
+            width: 260px;
+            background: var(--primary-dark);
+            color: white;
+            padding: 25px;
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 { color: var(--student-green); margin-bottom: 40px; font-size: 1.5rem; text-align: center; }
+
+        .nav-links { list-style: none; flex-grow: 1; }
+        .nav-links li { margin-bottom: 12px; }
+        .nav-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            display: block;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--student-green);
+            transform: translateX(5px);
+        }
+
+        /* Main Feed Area */
+        .main-content { margin-left: 260px; flex-grow: 1; padding: 40px; }
+
+        .feed-header {
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feed-header h1 { font-size: 2rem; color: var(--primary-dark); }
+
+        /* News Cards */
+        .news-grid { display: grid; gap: 25px; max-width: 900px; }
+
+        .news-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--student-green);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .news-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .tag-update { background: #e8f8f0; color: #2ecc71; }
+        .tag-event { background: #eef2ff; color: #6366f1; }
+        .tag-job { background: #fff7ed; color: #f59e0b; }
+        .tag-career { background: #fff7ed; color: #f59e0b; }
+
+        /* Filter Buttons */
+        .filter-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            border: 2px solid var(--accent-blue);
+            background: var(--white);
+            color: var(--accent-blue);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .job-card {
+            border-left: 5px solid #f59e0b;
+        }
+
+        .job-salary { 
+            color: #f59e0b;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .timestamp { color: #95a5a6; }
+
+        .news-card h3 { font-size: 1.4rem; margin-bottom: 10px; color: var(--primary-dark); }
+        .news-card p { line-height: 1.6; color: #576574; margin-bottom: 15px; }
+
+        .author-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .author-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ddd;
+        }
+
+        /* Loading Spinner */
+        .loader { text-align: center; padding: 50px; font-weight: bold; color: var(--accent-blue); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <h2 id="sidebarTitle">Hub</h2>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#" id="dashboardLink">🏠 Dashboard</a></li>
+            <li><a href="#" class="active">📰 Latest News</a></li>
+            <li><a href="#" id="secondaryLink">💼 Link</a></li>
+            <li><a href="profile-settings.html">⚙️ My Profile</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="feed-header">
+            <h1>Latest Updates</h1>
+            <div class="filter-options">
+                <button class="filter-btn active" onclick="filterFeed('all')">All</button>
+                <button class="filter-btn" onclick="filterFeed('news')">📰 News</button>
+                <button class="filter-btn" onclick="filterFeed('jobs')">💼 Job Posts</button>
+            </div>
+        </div>
+
+        <div id="newsFeed" class="news-grid">
+            <div class="loader">Fetching the latest updates from Alumni...</div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        let allFeeds = [];
+        const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+
+        // Check authentication and determine user type
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const userType = localStorage.getItem('userType');
+            if (!token) {
+                alert('You must be logged in to view news.');
+                window.location.href = 'studentlogin.html';
+            }
+            // Set sidebar based on user type
+            if (userType === 'alumni') {
+                document.getElementById('sidebarTitle').textContent = 'Alumni Hub';
+                document.getElementById('dashboardLink').href = 'alumni-dashboard.html';
+                document.getElementById('secondaryLink').textContent = '✍️ Share News';
+                document.getElementById('secondaryLink').href = 'share-news.html';
+            } else {
+                document.getElementById('sidebarTitle').textContent = 'Student Hub';
+                document.getElementById('dashboardLink').href = 'student-dashboard.html';
+                document.getElementById('secondaryLink').textContent = '💼 Career Board';
+                document.getElementById('secondaryLink').href = 'view-jobs.html';
+            }
+        }
+
+        async function loadFeeds() {
+            const feedContainer = document.getElementById('newsFeed');
+            allFeeds = [];
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                // Fetch news from connected alumni only (filtered by backend)
+                const newsResponse = await fetch(`${API_URL}/api/news`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (newsResponse.ok) {
+                    const newsData = await newsResponse.json();
+                    newsData.forEach(post => {
+                        allFeeds.push({
+                            type: 'news',
+                            category: post.category || 'General',
+                            title: post.title,
+                            content: post.content,
+                            author: post.authorName || (post.authorId?.fullName || 'Unknown'),
+                            authorProfession: post.authorId?.profession || '',
+                            createdAt: post.createdAt,
+                            id: post._id
+                        });
+                    });
+                } else if (newsResponse.status === 401) {
+                    throw new Error('Unauthorized. Please log in again.');
+                }
+
+                // Fetch jobs
+                const jobsResponse = await fetch(`${API_URL}/api/jobs`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (jobsResponse.ok) {
+                    const jobsData = await jobsResponse.json();
+                    jobsData.forEach(job => {
+                        allFeeds.push({
+                            type: 'jobs',
+                            category: 'Career',
+                            title: job.title,
+                            content: job.description,
+                            author: job.postedBy || 'Alumni',
+                            createdAt: job.createdAt,
+                            id: job._id,
+                            company: job.company,
+                            location: job.location,
+                            salary: job.salary
+                        });
+                    });
+                }
+
+                // Sort by date (newest first)
+                allFeeds.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                if (allFeeds.length === 0) {
+                    feedContainer.innerHTML = "<div class='news-card'><p>No updates posted yet. Connect with more alumni to see their updates!</p></div>";
+                    return;
+                }
+
+                displayFeeds(allFeeds);
+
+            } catch (error) {
+                console.error(error);
+                if (error.message.includes('Unauthorized')) {
+                    localStorage.clear();
+                    window.location.href = 'studentlogin.html';
+                }
+                feedContainer.innerHTML = "<div class='news-card' style='border-color: #e74c3c;'><p>Error loading updates. Is the server running?</p></div>";
+            }
+        }
+
+        function displayFeeds(feeds) {
+            const feedContainer = document.getElementById('newsFeed');
+            feedContainer.innerHTML = '';
+
+            if (feeds.length === 0) {
+                feedContainer.innerHTML = "<div class='news-card'><p>No updates found for this category.</p></div>";
+                return;
+            }
+
+            feeds.forEach(feed => {
+                const postDate = new Date(feed.createdAt).toLocaleDateString('en-US', {
+                    month: 'short', day: 'numeric', year: 'numeric'
+                });
+
+                let cardClass = 'news-card';
+                let categoryDisplay = feed.category;
+                let extraContent = '';
+
+                if (feed.type === 'jobs') {
+                    cardClass = 'news-card job-card';
+                    categoryDisplay = '💼 ' + feed.category;
+                    extraContent = `
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                            <p style="margin: 8px 0;"><strong>Company:</strong> ${feed.company || 'N/A'}</p>
+                            <p style="margin: 8px 0;"><strong>Location:</strong> ${feed.location || 'N/A'}</p>
+                            ${feed.salary ? `<p class="job-salary">💰 ${feed.salary}</p>` : ''}
+                        </div>
+                    `;
+                } else {
+                    categoryDisplay = feed.category;
+                }
+
+                const categoryClass = `tag-${feed.type === 'jobs' ? 'career' : feed.category?.toLowerCase() || 'update'}`;
+
+                feedContainer.innerHTML += `
+                    <div class="${cardClass}">
+                        <div class="card-meta">
+                            <span class="tag ${categoryClass}">${categoryDisplay}</span>
+                            <span class="timestamp">${postDate}</span>
+                        </div>
+                        <h3>${feed.title}</h3>
+                        <p>${feed.content}</p>
+                        ${extraContent}
+                        <div class="author-box">
+                            <img src="https://ui-avatars.com/api/?name=${feed.author}&background=random" class="author-avatar">
+                            <span>Posted by <strong>${feed.author}</strong>${feed.authorProfession ? ' • ' + feed.authorProfession : ''}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterFeed(type) {
+            // Update button styling
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter and display
+            if (type === 'all') {
+                displayFeeds(allFeeds);
+            } else {
+                const filtered = allFeeds.filter(feed => feed.type === type);
+                displayFeeds(filtered);
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', function() {
+            checkAuth();
+            loadFeeds();
+        });
+    </script>
+</body>
+</html>

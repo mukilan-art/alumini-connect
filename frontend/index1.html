@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alumni Connect - Home</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1a2f5a 50%, #059669 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 8vw, 4rem);
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: -0.5px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 32px;
+      opacity: 0.95;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    .start-btn {
+      padding: 14px 48px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+    }
+
+    .start-btn:active {
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 16px;
+      }
+
+      p {
+        font-size: 0.95rem;
+        margin-bottom: 24px;
+      }
+
+      .start-btn {
+        padding: 12px 36px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Alumni Connect</h1>
+  <p>Reconnect with your college alumni network, share opportunities, and grow together</p>
+  <button class="start-btn" onclick="window.location.href='index2.html'">Get Started</button>
+</body>
+</html>

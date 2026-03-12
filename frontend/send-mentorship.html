@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Mentorship</title>
+    <style>
+        body{font-family:'Segoe UI',sans-serif;background:#f4f7f6;padding:30px;}
+        .card{max-width:600px;margin:40px auto;background:#fff;padding:24px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.08);}
+        h1{margin-bottom:24px;color:#2c3e50;}
+        .field{margin-bottom:18px;}
+        label{display:block;margin-bottom:6px;font-weight:600;color:#34495e;}
+        input,textarea{width:100%;padding:10px;border:1px solid #ccd0d5;border-radius:8px;font-size:1rem;}
+        textarea{resize:vertical;min-height:120px;}
+        .btn{background:#3498db;color:#fff;padding:12px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:background 0.2s;}
+        .btn:hover{background:#2980b9;}
+        .note{font-size:0.9rem;color:#6b7280;margin-top:12px;}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Send Mentorship Request</h1>
+        <div class="field">
+            <label for="alumniEmail">Alumni Email (preferred)</label>
+            <input type="email" id="alumniEmail" placeholder="alumni@example.com">
+        </div>
+        <div class="field">
+            <label for="alumniId">or Alumni ID</label>
+            <input type="text" id="alumniId" placeholder="5f1e3c...">
+        </div>
+        <div class="field">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" placeholder="Career guidance in AI">
+        </div>
+        <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Write a short message..."></textarea>
+        </div>
+        <button class="btn" id="sendBtn">Send Request</button>
+        <p id="statusMsg" class="note"></p>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+        document.getElementById('sendBtn').addEventListener('click', async () => {
+            const email = document.getElementById('alumniEmail').value.trim();
+            const alumniId = document.getElementById('alumniId').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const statusEl = document.getElementById('statusMsg');
+            statusEl.style.color = '#e74c3c'; statusEl.textContent = '';
+
+            if (!email && !alumniId) {
+                statusEl.textContent = 'Provide alumni email or ID.';
+                return;
+            }
+            if (!subject) {
+                statusEl.textContent = 'Subject is required.';
+                return;
+            }
+
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('sendBtn').textContent = 'Sending...';
+            try {
+                const token = localStorage.getItem('token');
+                const body = { subject, message };
+                if (email) body.alumniEmail = email;
+                else body.alumniId = alumniId;
+
+                const res = await fetch(`${API_URL}/api/mentorship/request`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || 'Failed to send request');
+
+                statusEl.style.color = '#27ae60';
+                statusEl.textContent = 'Request sent successfully!';
+                // clear form
+                document.getElementById('alumniEmail').value='';
+                document.getElementById('alumniId').value='';
+                document.getElementById('subject').value='';
+                document.getElementById('message').value='';
+            } catch (err) {
+                statusEl.textContent = err.message || 'Error sending request.';
+            } finally {
+                document.getElementById('sendBtn').disabled = false;
+                document.getElementById('sendBtn').textContent = 'Send Request';
+            }
+        });
+    </script>
+</body>
+</html>

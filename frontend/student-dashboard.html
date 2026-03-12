@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        #dashboard-layout {
+            min-height: 100vh;
+        }
+        
+        /* Enhanced Sidebar */
+        aside {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1a2f5a 100%);
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1) !important;
+        }
+
+        aside .p-6 {
+            padding: 24px 20px !important;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        aside h2 {
+            font-size: 1.3rem !important;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-link {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            margin-left: -4px;
+            padding-left: 16px !important;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: #60a5fa;
+            transform: none;
+            padding-left: 13px !important;
+        }
+
+        .sidebar-link.bg-blue-700 {
+            background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+            border-left-color: #ffffff;
+            padding-left: 13px !important;
+        }
+
+        aside .p-4:last-of-type {
+            padding: 16px 16px !important;
+            border-top: 2px solid rgba(255,255,255,0.1);
+        }
+
+        #logoutButton {
+            transition: all 0.3s ease;
+        }
+
+        #logoutButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Enhanced Header */
+        header {
+            border-bottom: 3px solid #2563eb !important;
+            background: white !important;
+        }
+
+        header h1 {
+            color: #1f2937 !important;
+            font-weight: 700 !important;
+        }
+
+        /* Card Enhancements */
+        .bg-white {
+            transition: all 0.3s ease;
+        }
+
+        .border-l-4 {
+            border-left-color: #2563eb !important;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important;
+        }
+
+        .shadow-lg:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12) !important;
+            transform: translateY(-5px);
+        }
+
+        /* Button Styles */
+        .btn-view {
+            transition: all 0.3s ease !important;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+        }
+
+        /* Notification Styles */
+        .notif-btn {
+            transition: all 0.3s ease;
+        }
+
+        .notif-btn:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .notif-dropdown {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+            border: 1px solid rgba(0,0,0,0.06) !important;
+        }
+
+        .notif-item {
+            transition: all 0.2s ease;
+        }
+
+        .notif-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .notif-item.unread {
+            background-color: #eff6ff;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .lg\:col-span-2 {
+                grid-column: span 1 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                margin-left: 0 !important;
+                padding: 16px !important;
+            }
+
+            aside {
+                width: 100% !important;
+                position: absolute;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <script src="config.js"></script>
+    <div id="dashboard-layout" class="flex">
+        <aside class="w-64 bg-blue-900 text-white flex flex-col fixed h-full shadow-lg">
+            <div class="p-6 border-b border-blue-700">
+                <h2 class="text-2xl font-extrabold tracking-wider">Alumni Connect</h2>
+            </div>
+
+            <nav class="flex-grow p-4 space-y-2">
+                <a href="#" class="sidebar-link block py-3 px-4 rounded-lg bg-blue-700 font-semibold">
+                    🏠 Dashboard
+                </a>
+                <a href="user-profile.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    👤 My Profile
+                </a>
+                <a href="chat.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    💬 Messages
+                </a>
+                <a href="view-mentorship.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🎓 Find Mentors
+                </a>
+                <a href="student-connections.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🔗 Alumni Connections
+                </a>
+                <a href="latest-news.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    📰 Latest News
+                </a>
+                <a href="view-jobs.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    💼 Job Postings
+                </a>
+                <a href="edit-profile.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    ✏️ Edit Profile
+                </a>
+                <a href="profile-settings.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    ⚙️ Profile Settings
+                </a>
+                <a href="search-page.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🔍 Search Alumni
+                </a>
+                <a href="view-events.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    📅 Events
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-blue-700">
+                <button id="logoutButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-lg transition-colors duration-300">
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-64 p-8">
+            <header class="bg-white shadow-md rounded-xl p-6 mb-8 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-800">Student Overview</h1>
+                <div class="text-sm text-gray-500">Want to upload certificates? Go to Profile Settings via sidebar.</div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            placeholder="Quick Search..."
+                            class="py-2 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+                    </div>
+
+                    <!-- Notification bell -->
+                    <div class="relative">
+                        <button id="notifBtnStudent" class="notif-btn" aria-label="Notifications">🔔<span id="notifCountStudent" class="notif-count" style="display:none">0</span></button>
+                        <div id="notifDropdownStudent" class="notif-dropdown" style="display:none; right:0;">
+                            <div id="notifListStudent"></div>
+                            <div id="notifEmptyStudent" class="notif-empty">No notifications</div>
+                        </div>
+                    </div>
+
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-lg border-l-4 border-blue-500">
+                    <div class="flex items-center space-x-6">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="relative group cursor-pointer">
+                                <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden shadow-md border-2 border-white">
+                                    <img
+                                        id="profile-picture"
+                                        src="https://ui-avatars.com/api/?name=Student"
+                                        alt="Profile"
+                                        class="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div class="absolute inset-0 rounded-lg bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                    <span class="text-white text-sm font-semibold">Change Photo</span>
+                                </div>
+                                <input 
+                                    type="file" 
+                                    id="profilePictureInput" 
+                                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml"
+                                    class="hidden"
+                                />
+                            </div>
+                            <a href="edit-profile.html" style="font-size:0.85rem; color:#2563eb; text-decoration:none; transition:0.3s; font-weight:600;">Edit Profile</a>
+                        </div>
+
+                        <div>
+                            <p class="text-3xl font-extrabold text-gray-800" id="welcomeMessage" style="color: #1f2937; margin: 0;">
+                                Welcome, Student!
+                            </p>
+                            <p class="text-md text-gray-600 mt-2" style="font-size: 0.95rem; margin: 0;">
+                                Navigate your alumni network and manage your profile.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
+                    <p class="text-sm font-medium text-gray-500">Total Alumni Connections</p>
+                    <p class="text-4xl font-bold text-gray-900 mt-3" id="alumniConnectionCount" style="color: #1e3a8a;">Loading...</p>
+                    <div style="margin-top:12px">
+                        <a href="student-connections.html" class="btn-view inline-block" style="background:#2563eb;color:white;padding:8px 12px;border-radius:6px;text-decoration:none">View Connections</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Suggested Connections</h2>
+                <p class="text-gray-600">Alumni who graduated from your department and location.</p>
+            </div>
+
+
+        </main>
+    </div>
+    <script>
+        // Early authentication check - runs BEFORE page loads
+        (function() {
+            const token = localStorage.getItem('token');
+            const userType = localStorage.getItem('userType');
+            const userId = localStorage.getItem('userId');
+
+            // Redirect immediately if not logged in
+            if (!token || !userId) {
+                window.location.href = 'studentlogin.html';
+                return;
+            }
+
+            // If logged in as alumni, send to alumni dashboard
+            if (userType === 'alumni') {
+                localStorage.clear();
+                window.location.href = 'alumnilogin.html';
+                return;
+            }
+
+            // If userType is missing or not student, go to student login
+            if (userType !== 'student') {
+                localStorage.clear();
+                window.location.href = 'studentlogin.html';
+                return;
+            }
+        })();
+
+        // Main page initialization
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            const userType = localStorage.getItem('userType');
+            const userId = localStorage.getItem('userId');
+
+            if (!token || userType !== 'student' || !userId) {
+                // This is a fallback, the early check above should have caught this
+                window.location.href = 'studentlogin.html';
+                return;
+            }
+
+            // Define variables for profile picture handling
+            const profilePictureParent = document.querySelector('.relative.group.cursor-pointer');
+            const profilePictureInput = document.getElementById('profilePictureInput');
+            const profilePictureImg = document.getElementById('profile-picture');
+
+            // Set base URL for API calls
+            const baseUrl = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+
+            // Fetch profile and populate name/avatar
+            try {
+                const res = await fetch(`${baseUrl}/api/users/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to fetch profile');
+                const user = await res.json();
+
+                const welcomeEl = document.getElementById('welcomeMessage');
+                const avatarEl = document.getElementById('profile-picture');
+
+                if (welcomeEl && user.fullName) welcomeEl.textContent = `Welcome, ${user.fullName}!`;
+                if (avatarEl) {
+                    // Prefer user-scoped localStorage image (set at upload time) then fallback to server image and legacy generic key
+                    let storedPic = null;
+                    try { storedPic = localStorage.getItem(`profileImage_${userId}`) || localStorage.getItem('profileImage'); } catch(e) { console.warn('localStorage read failed', e); }
+                    if (storedPic) {
+                        avatarEl.src = storedPic;
+                    } else if (user.profileImage) {
+                        avatarEl.src = user.profileImage;
+                    } else if (user.fullName) {
+                        avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}`;
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading student profile:', err);
+                // On failure, clear session and redirect to login
+                localStorage.clear();
+                window.location.href = 'studentlogin.html';
+                return;
+            }
+
+            // Fetch and display alumni count
+            try {
+                const countRes = await fetch(`${baseUrl}/api/alumni/count`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (countRes.ok) {
+                    const data = await countRes.json();
+                    const countEl = document.getElementById('alumniConnectionCount');
+                    if (countEl) {
+                        countEl.textContent = data.count.toLocaleString();
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading alumni count:', err);
+            }
+
+                // Fetch connections count for student (accepted connections)
+                try {
+                    const res = await fetch(`${baseUrl}/api/connections/count/${userId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const d = await res.json();
+                        const el = document.getElementById('alumniConnectionCount');
+                        if (el) el.textContent = (d.count || 0).toLocaleString();
+                    }
+                } catch (e) { console.warn('Could not fetch student connection count', e); }
+            // Click on parent container to trigger file input
+            if (profilePictureParent) {
+                profilePictureParent.addEventListener('click', (e) => {
+                    if (profilePictureInput) {
+                        profilePictureInput.click();
+                    }
+                });
+            }
+
+            if (profilePictureInput) {
+                profilePictureInput.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    // Convert image to base64 and compress
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        try {
+                            // Create canvas to compress image
+                            const img = new Image();
+                            img.onload = async () => {
+                                const canvas = document.createElement('canvas');
+                                let width = img.width;
+                                let height = img.height;
+                                
+                                // Reduce size if image is too large
+                                const maxWidth = 400;
+                                const maxHeight = 400;
+                                if (width > maxWidth || height > maxHeight) {
+                                    const scale = Math.min(maxWidth / width, maxHeight / height);
+                                    width *= scale;
+                                    height *= scale;
+                                }
+                                
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, width, height);
+                                
+                                // Compress to JPEG with quality 0.7
+                                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                                
+                                try {
+                                    const updateRes = await fetch(`${baseUrl}/api/users/${userId}`, {
+                                        method: 'PUT',
+                                        headers: { 
+                                            'Content-Type': 'application/json',
+                                            'Authorization': `Bearer ${token}`
+                                        },
+                                        body: JSON.stringify({ profileImage: compressedBase64 })
+                                    });
+
+                                    if (!updateRes.ok) {
+                                        const errorData = await updateRes.json();
+                                        throw new Error(errorData.message || 'Failed to update profile picture');
+                                    }
+                                    
+                                    // Update the image on the page
+                                    profilePictureImg.src = compressedBase64;
+                                    try {
+                                        localStorage.setItem(`profileImage_${userId}`, compressedBase64);
+                                        localStorage.removeItem('profileImage');
+                                    } catch(e) { console.warn('Could not save profileImage to localStorage', e); }
+                                    alert('Profile picture updated successfully!');
+                                } catch (err) {
+                                    console.error('Error updating profile picture:', err);
+                                    alert('Failed to update profile picture: ' + err.message);
+                                }
+                            };
+                            img.src = event.target.result;
+                        } catch (err) {
+                            console.error('Error processing image:', err);
+                            alert('Error processing image. Please try a different file.');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // Check if there is a query in the URL (from the dashboard)
+            const params = new URLSearchParams(window.location.search);
+            const initialQuery = params.get('q');
+            const pageSearchInput = document.getElementById('pageSearchInput');
+            
+            if (initialQuery && pageSearchInput) {
+                pageSearchInput.value = initialQuery;
+                executeSearch(initialQuery);
+            }
+        });
+
+        async function handleSearch() {
+            const query = document.getElementById('pageSearchInput').value;
+            executeSearch(query);
+        }
+
+        async function executeSearch(query) {
+            const grid = document.getElementById('resultsGrid');
+            const status = document.getElementById('searchStatus');
+            const emptyState = document.getElementById('emptyState');
+            const token = localStorage.getItem('token');
+
+            // Show loading state
+            grid.innerHTML = '';
+            emptyState.classList.add('hidden');
+            status.textContent = `Searching for "${query}"...`;
+
+            try {
+                const baseUrl = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+                const response = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(query)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Search failed');
+
+                const alumni = await response.json();
+                status.textContent = `Found ${alumni.length} alumni`;
+
+                if (alumni.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                // Map results to Tailwind Cards (View Profile links to profile page)
+                grid.innerHTML = alumni.map(person => `
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition duration-300">
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(person.fullName)}&background=DBEAFE&color=1E40AF&bold=true" 
+                                 class="w-14 h-14 rounded-full border-2 border-blue-50">
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">${person.fullName}</h3>
+                                <span class="text-xs font-bold px-2 py-1 bg-blue-50 text-blue-600 rounded-full uppercase tracking-wider">
+                                    Class of ${person.graduationYear || 'N/A'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="space-y-2 mb-6">
+                            <p class="text-gray-600 flex items-center gap-2 text-sm">
+                                <span class="opacity-50">💼</span> ${person.profession || 'Alumni Member'}
+                            </p>
+                            <p class="text-gray-600 flex items-center gap-2 text-sm">
+                                <span class="opacity-50">📧</span> ${person.email}
+                            </p>
+                        </div>
+                        <a href="user-profile.html?userId=${person._id}" class="w-full block text-center py-3 bg-gray-900 hover:bg-blue-600 text-white rounded-xl font-semibold transition flex justify-center items-center gap-2">
+                            View Profile
+                        </a>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error(error);
+                status.textContent = "Error connecting to server.";
+            }
+        }
+
+        // Allow pressing "Enter" in the search box (guarded)
+        const pageSearchInputEl = document.getElementById('pageSearchInput');
+        if (pageSearchInputEl) {
+            pageSearchInputEl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSearch();
+            });
+        }
+
+        /* Notifications (Student) */
+        const notifBtnStudent = document.getElementById('notifBtnStudent');
+        const notifDropdownStudent = document.getElementById('notifDropdownStudent');
+        const notifListStudent = document.getElementById('notifListStudent');
+        const notifCountStudent = document.getElementById('notifCountStudent');
+        const notifEmptyStudent = document.getElementById('notifEmptyStudent');
+
+        async function fetchUnreadCountStudent() {
+            try {
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('userId');
+                if (!token || !userId) return;
+                const res = await fetch(`${baseUrl}/api/notifications/unreadCount/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return; const data = await res.json(); updateStudentNotifBadge(data.count || 0);
+            } catch (err) { console.error('Unread count (student) error', err); }
+        }
+
+        function updateStudentNotifBadge(count) {
+            if (!notifCountStudent) return;
+            if (count && count > 0) { notifCountStudent.style.display = 'inline-block'; notifCountStudent.textContent = count; }
+            else { notifCountStudent.style.display = 'none'; }
+        }
+
+        async function fetchNotificationsStudent() {
+            try {
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('userId');
+                if (!token || !userId) return;
+                const res = await fetch(`${baseUrl}/api/notifications/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) { notifListStudent.innerHTML = ''; notifEmptyStudent.style.display = 'block'; return; }
+                const notes = await res.json();
+                if (!notes || notes.length === 0) { notifListStudent.innerHTML = ''; notifEmptyStudent.style.display = 'block'; return; }
+                notifEmptyStudent.style.display = 'none';
+                notifListStudent.innerHTML = notes.map(n => {
+                    const date = new Date(n.createdAt).toLocaleString();
+                    return `<div class="notif-item ${n.read ? '' : 'unread'}" data-id="${n._id}" data-link="${n.link || ''}">
+                        <div style="font-size:0.95rem;color:#111827">${n.title}</div>
+                        <p>${n.message || ''}</p>
+                        <div style="font-size:0.8rem;color:#9ca3af">${date}</div>
+                    </div>`;
+                }).join('');
+
+                document.querySelectorAll('#notifListStudent .notif-item').forEach(el => {
+                    el.addEventListener('click', async (e) => {
+                        const id = el.getAttribute('data-id');
+                        const link = el.getAttribute('data-link');
+                        try {
+                            await markNotificationReadStudent(id);
+                            if (link) window.location.href = link; else notifDropdownStudent.style.display='none';
+                        } catch (err) { console.error('mark student notif read error', err); }
+                    });
+                });
+            } catch (err) { console.error('Fetch student notifications error', err); notifListStudent.innerHTML = ''; notifEmptyStudent.style.display = 'block'; }
+        }
+
+        async function markNotificationReadStudent(id) {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${baseUrl}/api/notifications/${id}/read`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } });
+                if (!res.ok) throw new Error('Failed to mark read');
+                await fetchUnreadCountStudent();
+                await fetchNotificationsStudent();
+            } catch (err) { console.error('Mark student notification read failed', err); }
+        }
+
+        if (notifBtnStudent) {
+            notifBtnStudent.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (notifDropdownStudent.style.display === 'block') { notifDropdownStudent.style.display = 'none'; }
+                else { notifDropdownStudent.style.display = 'block'; fetchNotificationsStudent(); }
+            });
+        }
+
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!notifBtnStudent) return;
+            const outside = !notifBtnStudent.contains(e.target) && !notifDropdownStudent.contains(e.target);
+            if (outside) notifDropdownStudent.style.display = 'none';
+        });
+
+        // Poll and initial load
+        setInterval(fetchUnreadCountStudent, 30000);
+        fetchUnreadCountStudent();
+
+        // Add logout handler
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userType');
+                localStorage.removeItem('userId');
+                window.location.href = 'studentlogin.html';
+            });
+        }
+
+    </script>
+</body>
+</html>

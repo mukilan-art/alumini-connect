@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Board | Connect+</title>
+    <style>
+        /* COMBINED CSS - PROFESSIONAL THEME */
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+            --text-muted: #7f8c8d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { background-color: var(--bg); color: var(--primary); }
+
+        /* Header & Search */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: -30px auto 30px;
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        /* Job List */
+        .job-container {
+            max-width: 900px;
+            margin: 0 auto 50px;
+            padding: 0 20px;
+        }
+
+        .job-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .job-card:hover { transform: translateY(-3px); }
+
+        .job-info h2 { font-size: 1.3rem; margin-bottom: 5px; color: var(--primary); }
+        .job-info p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 3px; }
+        
+        .company-name { font-weight: bold; color: var(--accent); }
+        .location-tag { background: #e8f4fd; color: #3498db; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; }
+
+        .btn-apply {
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-apply:hover { background: #2980b9; }
+
+        .back-nav { padding: 20px; max-width: 900px; margin: auto; }
+        .back-nav a { text-decoration: none; color: var(--accent); font-weight: bold; }
+
+        #noJobs { text-align: center; padding: 50px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <div class="back-nav">
+        <a href="student-dashboard.html">← Back to Dashboard</a>
+    </div>
+
+    <div class="header">
+        <h1>Career Opportunities</h1>
+        <p>Explore jobs and internships posted by our Alumni network</p>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search by job title or company..." onkeyup="filterJobs()">
+    </div>
+
+    <div class="job-container" id="jobList">
+        <p id="noJobs">Loading opportunities...</p>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        let allJobs = [];
+
+        async function fetchJobs() {
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+            
+            try {
+                // You'll need to create this GET route in your backend!
+                const response = await fetch(`${API_URL}/api/jobs`);
+                allJobs = await response.json();
+
+                displayJobs(allJobs);
+            } catch (error) {
+                document.getElementById('jobList').innerHTML = "<p>Error connecting to server. Please ensure backend is running.</p>";
+            }
+        }
+
+        function displayJobs(jobs) {
+            const container = document.getElementById('jobList');
+            if (jobs.length === 0) {
+                container.innerHTML = "<p id='noJobs'>No job opportunities found matching your search.</p>";
+                return;
+            }
+
+            container.innerHTML = jobs.map(job => `
+                <div class="job-card">
+                    <div class="job-info">
+                        <h2>${job.title}</h2>
+                        <p class="company-name">${job.company}</p>
+                        <p><span class="location-tag">📍 ${job.location}</span></p>
+                        <p style="margin-top: 10px; color: #555;">${job.description.substring(0, 100)}...</p>
+                    </div>
+                    <a href="${job.applyLink.startsWith('http') ? job.applyLink : 'mailto:' + job.applyLink}" target="_blank" class="btn-apply">Apply Now</a>
+                </div>
+            `).join('');
+        }
+
+        function filterJobs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allJobs.filter(job => 
+                job.title.toLowerCase().includes(searchTerm) || 
+                job.company.toLowerCase().includes(searchTerm)
+            );
+            displayJobs(filtered);
+        }
+
+        window.onload = fetchJobs;
+    </script>
+</body>
+</html>

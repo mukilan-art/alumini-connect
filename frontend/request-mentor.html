@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request Mentorship</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #2ecc71; --bg: #f4f7f6; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 50px; }
+        .req-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { color: var(--primary); margin-bottom: 20px; border-left: 5px solid var(--accent); padding-left: 15px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-send { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="req-card">
+        <h2>Ask for Mentorship</h2>
+        <form id="mentorshipForm">
+            <div class="form-group">
+                <label>What do you need help with?</label>
+                <input type="text" id="subject" placeholder="e.g. Career Guidance in AI" required>
+            </div>
+            <div class="form-group">
+                <label>Brief Message</label>
+                <textarea id="message" rows="4" placeholder="Explain your goals..."></textarea>
+            </div>
+            <button type="submit" class="btn-send">Send Request</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('mentorshipForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // In a real app, you'd pick the alumniId from a list of alumni
+            const token = localStorage.getItem('token');
+            const requestData = {
+                alumniId: "ALUMNI_ID_HERE",
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value
+            };
+
+            const response = await fetch('http://localhost:5000/api/mentorship/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(requestData)
+            });
+
+            if(response.ok) alert("Request Sent!");
+        });
+    </script>
+</body>
+</html>

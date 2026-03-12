@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Requests | Alumni Connect</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="/assets/styles.css">
+    <style>
+        body { font-family: Inter, system-ui, Arial; padding: 24px; background:#f7fafc; }
+        .container{max-width:1000px;margin:0 auto}
+        h1{font-size:1.6rem;margin-bottom:12px}
+        .section{background:white;padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:16px}
+        .row{display:flex;gap:12px;align-items:center}
+        .btn{padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+        .btn-accept{background:#10b981;color:white}
+        .btn-decline{background:#ef4444;color:white}
+        .item{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #f1f5f9}
+        .empty{color:#6b7280;padding:12px}
+        .meta{color:#9ca3af;font-size:0.9rem}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Requests</h1>
+        <p class="meta">All incoming mentorship and connection requests from students. Accepting will create a connection.</p>
+
+        <div id="mentorshipSection" class="section">
+            <h2 style="margin-top:0">Mentorship Requests</h2>
+            <div id="mentorshipList"><div class="empty">Loading mentorship requests...</div></div>
+        </div>
+
+        <div id="connectionSection" class="section">
+            <h2 style="margin-top:0">Connection Requests</h2>
+            <div id="connectionList"><div class="empty">Loading connection requests...</div></div>
+        </div>
+
+    </div>
+
+<script>
+const API = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+const token = localStorage.getItem('token');
+const userId = localStorage.getItem('userId');
+
+async function loadMentorship() {
+    try {
+        const res = await fetch(`${API}/api/mentorship/alumni/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!res.ok) throw new Error('Failed to load');
+        const data = await res.json();
+        const list = document.getElementById('mentorshipList');
+        if (!data || data.length === 0) { list.innerHTML = '<div class="empty">No mentorship requests.</div>'; return; }
+        list.innerHTML = data.map(r => `
+            <div class="item" id="ment-${r._id}">
+                <div>
+                    <div style="font-weight:700">${r.studentName || 'Student'}</div>
+                    <div class="meta">Topic: ${r.subject || '—'}</div>
+                    <div style="margin-top:6px">${r.message || ''}</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button class="btn btn-accept" data-id="${r._id}" data-type="mentorship">Accept</button>
+                    <button class="btn btn-decline" data-id="${r._id}" data-type="mentorship">Decline</button>
+                </div>
+            </div>
+        `).join('');
+
+        attachButtons();
+    } catch (err) {
+        document.getElementById('mentorshipList').innerHTML = '<div class="empty">Error loading mentorship requests.</div>';
+    }
+}
+
+async function loadConnections() {
+    try {
+        const res = await fetch(`${API}/api/connections/alumni/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!res.ok) throw new Error('Failed to load');
+        const data = await res.json();
+        const list = document.getElementById('connectionList');
+        if (!data || data.length === 0) { list.innerHTML = '<div class="empty">No connection requests.</div>'; return; }
+        list.innerHTML = data.map(r => `
+            <div class="item" id="conn-${r._id}">
+                <div>
+                    <div style="font-weight:700">${r.requesterId.fullName || 'Student'}</div>
+                    <div class="meta">${r.requesterId.email || ''}</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button class="btn btn-accept" data-id="${r._id}" data-type="connection">Accept</button>
+                    <button class="btn btn-decline" data-id="${r._id}" data-type="connection">Decline</button>
+                </div>
+            </div>
+        `).join('');
+
+        attachButtons();
+    } catch (err) {
+        document.getElementById('connectionList').innerHTML = '<div class="empty">Error loading connection requests.</div>';
+    }
+}
+
+function attachButtons() {
+    document.querySelectorAll('.btn-accept').forEach(b => b.onclick = async (e) => {
+        const id = e.currentTarget.getAttribute('data-id');
+        const type = e.currentTarget.getAttribute('data-type');
+        await performAction(id, type, 'Accepted');
+    });
+    document.querySelectorAll('.btn-decline').forEach(b => b.onclick = async (e) => {
+        const id = e.currentTarget.getAttribute('data-id');
+        const type = e.currentTarget.getAttribute('data-type');
+        await performAction(id, type, 'Declined');
+    });
+}
+
+async function performAction(id, type, status) {
+    try {
+        if (type === 'mentorship') {
+            const res = await fetch(`${API}/api/mentorship/${id}`, { method: 'PUT', headers: { 'Content-Type':'application/json','Authorization':`Bearer ${token}` }, body: JSON.stringify({ status }) });
+            if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || 'Failed'); }
+        } else if (type === 'connection') {
+            // For connection accepts, endpoint is /api/connections/:id/accept for acceptance
+            if (status === 'Accepted') {
+                const res = await fetch(`${API}/api/connections/${id}/accept`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || 'Failed'); }
+            } else {
+                // Decline (we reuse accept endpoint with body status Declined)
+                const res = await fetch(`${API}/api/connections/${id}/accept`, { method: 'PUT', headers: { 'Content-Type':'application/json','Authorization': `Bearer ${token}` }, body: JSON.stringify({ status: 'Declined' }) });
+                if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || 'Failed'); }
+            }
+        }
+
+        // Refresh lists and counts
+        await loadMentorship();
+        await loadConnections();
+        // Update notifications/unread counts on other UI if present
+        if (window.fetchUnreadCount) fetchUnreadCount();
+        alert('Request ' + status);
+    } catch (err) {
+        console.error('Action failed', err);
+        alert('Failed to perform action: ' + (err.message || ''));
+    }
+}
+
+window.onload = () => { loadMentorship(); loadConnections(); };
+</script>
+</body>
+</html>

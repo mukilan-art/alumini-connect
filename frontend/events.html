@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events & News</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        #dashboard-layout {
+            min-height: 100vh;
+        }
+        .sidebar-link {
+            transition: all 0.2s;
+        }
+        .sidebar-link:hover {
+            background-color: #1e3a8a; /* Darker blue on hover */
+            transform: translateX(5px);
+        }
+        .event-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .event-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="dashboard-layout" class="flex">
+        <aside class="w-64 bg-blue-900 text-white flex flex-col fixed h-full shadow-lg">
+            <div class="p-6 border-b border-blue-700">
+                <h2 class="text-2xl font-extrabold tracking-wider">Alumni Connect</h2>
+            </div>
+
+            <nav class="flex-grow p-4 space-y-2">
+                <a href="student-dashboard.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🏠 Dashboard
+                </a>
+                <a href="search-page.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🔍 Search Alumni
+                </a>
+                <a href="edit-profile.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    👤 Edit Profile
+                </a>
+                <a href="#" class="sidebar-link block py-3 px-4 rounded-lg bg-blue-700 font-semibold">
+                    📰 Events & News
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-blue-700">
+                <button id="logoutButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-lg transition-colors duration-300">
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-64 p-8">
+            <div class="bg-white p-10 rounded-xl shadow-lg">
+                <h1 class="text-3xl font-bold text-gray-800 border-b pb-4 mb-6">
+                    Upcoming Events & Latest News
+                </h1>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <h2 class="text-2xl font-semibold text-gray-700">
+                            Recent Events and Updates
+                        </h2>
+
+                        <div id="eventsContainer" class="space-y-4">
+                            <div class="event-card p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex items-start space-x-4 cursor-pointer">
+                                <div class="text-center bg-red-100 p-2 rounded-lg text-red-600 font-bold w-16 flex flex-col justify-center">
+                                    <span class="text-xl leading-none">25</span>
+                                    <span class="text-xs uppercase">Dec</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-900">Annual Alumni Dinner 2025</h3>
+                                    <p class="text-sm text-gray-600">
+                                        Join us for a celebration of the alumni community!
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        📍 Main Auditorium | 🕔 7:00 PM
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="event-card p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex items-start space-x-4 cursor-pointer">
+                                <div class="text-center bg-blue-100 p-2 rounded-lg text-blue-600 font-bold w-16 flex flex-col justify-center">
+                                    <span class="text-xl leading-none">10</span>
+                                    <span class="text-xs uppercase">Jan</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-900">Career Mentorship Workshop</h3>
+                                    <p class="text-sm text-gray-600">
+                                        Alumni experts share tips on landing your dream job.
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        💻 Online via Zoom | 🕔 10:00 AM
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="event-card p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex items-start space-x-4 cursor-pointer">
+                                <div class="text-center bg-green-100 p-2 rounded-lg text-green-600 font-bold w-16 flex flex-col justify-center">
+                                    <span class="text-xl leading-none">05</span>
+                                    <span class="text-xs uppercase">Feb</span>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-900">Campus Visit & Networking Meetup</h3>
+                                    <p class="text-sm text-gray-600">
+                                        Meet and network with alumni currently on campus.
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        🌳 Campus Grounds | 🕔 4:00 PM
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 space-y-6">
+                        <h2 class="text-2xl font-semibold text-gray-700">Latest News</h2>
+                        <div class="bg-gray-100 p-4 rounded-xl shadow-inner space-y-4">
+                            <div class="p-3 bg-white rounded-lg border border-gray-200">
+                                <h4 class="font-semibold text-blue-700">
+                                    New Alumni Portal Launched!
+                                </h4>
+                                <p class="text-xs text-gray-600 mt-1">
+                                    We are excited to announce the launch of our updated portal, featuring enhanced search and profile tools. (Posted: Yesterday)
+                                </p>
+                            </div>
+                            <div class="p-3 bg-white rounded-lg border border-gray-200">
+                                <h4 class="font-semibold text-blue-700">
+                                    Funding Opportunity for Student Projects
+                                </h4>
+                                <p class="text-xs text-gray-600 mt-1">
+                                    Alumnus John Doe pledges $50k for innovation grants. Click here to apply. (Posted: 3 days ago)
+                                </p>
+                            </div>
+                        </div>
+
+                        <h2 class="text-2xl font-semibold text-gray-700 pt-4">
+                            Filter Events
+                        </h2>
+                        <div class="space-y-4">
+                            <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                                <option>Filter by Category</option>
+                                <option>Networking</option>
+                                <option>Career</option>
+                                <option>Social</option>
+                            </select>
+                            <button class="w-full bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 rounded-lg transition-colors">
+                                View Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const userType = localStorage.getItem('userType');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+
+            // 🛑 REDIRECT CHECK 🛑
+            if (!token || !userType) {
+                window.location.href = userType === 'alumni' ? './alumnilogin.html' : './studentlogin.html';
+                return;
+            }
+
+            // LOGOUT BUTTON FUNCTIONALITY
+            document.getElementById('logoutButton').addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userType');
+                window.location.href = userType === 'alumni' ? './alumnilogin.html' : './studentlogin.html';
+            });
+
+            // NOTE: Future functionality to fetch events from backend would go here:
+            // const fetchEvents = async () => { ... }
+            // fetchEvents();
+        });
+    </script>
+</body>
+</html>

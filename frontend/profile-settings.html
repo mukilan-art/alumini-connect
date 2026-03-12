@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings | Connect+</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --accent: #1a73e8;
+        --bg: #f1f5f9;
+        --card: #ffffff;
+        --border: #e5e7eb;
+        --text: #0f172a;
+        --muted: #64748b;
+    }
+
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+    }
+
+    /* Main container */
+    .settings-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        background: var(--card);
+        border-radius: 14px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+        display: flex;
+        overflow: hidden;
+    }
+
+    /* Sidebar */
+    .settings-nav {
+        width: 260px;
+        background: #f8fafc;
+        border-right: 1px solid var(--border);
+        padding: 24px 18px;
+    }
+
+    .settings-nav h4 {
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 16px;
+        padding-left: 8px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        font-weight: 500;
+        color: #334155;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+        background: #eef2ff;
+        color: var(--accent);
+    }
+
+    .nav-item.active {
+        background: #e0e7ff;
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    /* Content */
+    .settings-content {
+        flex: 1;
+        padding: 36px 44px;
+    }
+
+    .settings-content h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--accent);
+    }
+
+    .subheading {
+        font-size: 1rem;
+        color: var(--muted);
+        margin-bottom: 24px;
+    }
+
+    .settings-content h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    /* Avatar card */
+    .avatar-upload {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 28px;
+    }
+
+    .avatar-preview {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
+        object-fit: cover;
+    }
+
+    /* Forms */
+    .form-group {
+        margin-bottom: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    input, textarea {
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    input:disabled {
+        background: #f1f5f9;
+        cursor: not-allowed;
+    }
+
+    /* Buttons */
+    .btn-save {
+        background: var(--accent);
+        color: white;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: fit-content;
+    }
+
+    .btn-save:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-save.secondary {
+        background: #64748b;
+    }
+
+    /* Password strength meter */
+    .pw-meter-bar { height: 8px; background:#e6eef6; border-radius: 999px; overflow:hidden; width: 240px; }
+    .pw-meter-fill { height:100%; width:0%; background: linear-gradient(90deg,#ef4444,#f97316,#f59e0b,#10b981,#06b6d4); transition: width 0.18s ease, background 0.18s ease; }
+    #pwStrengthText { font-size: 0.9rem; display:inline-block; }
+    #pwRules div { margin:4px 0; }
+    #pwRules span { width:18px; display:inline-block; font-weight:700; margin-right:6px; color: var(--muted); }
+
+    /* Sections */
+    .content-section {
+        display: none;
+    }
+
+    .content-section.active {
+        display: block;
+        animation: fadeIn 0.25s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .settings-container {
+            flex-direction: column;
+            margin: 20px;
+        }
+
+        .settings-nav {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .settings-content {
+            padding: 24px;
+        }
+    }
+</style>
+
+</head>
+<body>
+
+    <div class="settings-container">
+        <div class="settings-nav">
+            <div class="nav-item active" onclick="showSection('account')">👤 Account Info</div>
+            <div class="nav-item" onclick="showSection('security')">🔒 Security</div>
+            <div class="nav-item" onclick="showSection('profileSection')">💼 Profile Info</div>
+            <div class="nav-item" onclick="showSection('uploads')">📁 Uploads</div>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #dee2e6;">
+            <div class="nav-item" onclick="goBack()" style="color: var(--danger);">⬅ Back to Dashboard</div>
+        </div>
+
+        <div class="settings-content">
+            <h1>Profile Settings</h1>
+            <p class="subheading">Keep your information up to date so others can connect with you professionally.</p>
+            
+            <div id="account" class="content-section active">
+                <h2>Account Settings</h2>
+                <div class="avatar-upload">
+                    <img src="https://ui-avatars.com/api/?name=User&background=3498db&color=fff" id="preview" class="avatar-preview">
+                    <input type="file" id="profilePictureInput" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml" style="display:none">
+                    <button id="changePhotoBtn" class="btn-save" style="background:#6c757d; font-size: 0.8rem;">Change Photo</button>
+                </div>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" placeholder="Loading...">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="displayEmail" disabled style="background: #f8f9fa; cursor: not-allowed;">
+                    </div>
+                    <button type="submit" class="btn-save">Save Changes</button>
+                </form>
+            </div>
+
+            <div id="security" class="content-section">
+                <h2>Security Settings</h2>
+                <form id="securityForm" class="">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" placeholder="Enter current password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password <span title="Password strength" style="font-size:0.85rem;color:var(--muted);">🔒</span></label>
+                        <input type="password" id="newPassword" placeholder="Minimum 8 characters" required aria-describedby="pwHelp">
+
+                        <div class="pw-meter" style="margin-top:8px; display:flex; align-items:center; gap:12px;">
+                            <div class="pw-meter-bar" aria-hidden="true"><div class="pw-meter-fill" style="width:0%"></div></div>
+                            <div id="pwStrengthText" class="helper-text" style="margin:0;">Strength: <strong id="pwStrengthLabel">Very Weak</strong></div>
+                        </div>
+
+                        <div id="pwRules" class="helper-text" style="margin-top:10px;">
+                            <div><span id="rule-length" style="color:var(--muted)">◻︎</span> At least 8 characters</div>
+                            <div><span id="rule-upper" style="color:var(--muted)">◻︎</span> Uppercase letter</div>
+                            <div><span id="rule-lower" style="color:var(--muted)">◻︎</span> Lowercase letter</div>
+                            <div><span id="rule-number" style="color:var(--muted)">◻︎</span> Number</div>
+                            <div><span id="rule-special" style="color:var(--muted)">◻︎</span> Special character</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Repeat new password" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="helper-text"><input type="checkbox" id="showPasswords"> Show passwords</label>
+                    </div>
+                    <div class="form-actions" style="display:flex; align-items:center; gap:12px;">
+                        <button type="submit" class="btn-save">Update Password</button>
+                        <span id="securityMsg" class="helper-text"></span>
+                    </div>
+                </form>
+            </div>
+
+            <div id="profileSection" class="content-section">
+                <h2>Profile Details</h2>
+                <div class="form-group">
+                    <label for="professionField">Profession/Title</label>
+                    <input type="text" id="professionField" placeholder="e.g. Software Engineer">
+                </div>
+                <div class="form-group">
+                    <label for="graduationYearField">Graduation Year</label>
+                    <input type="number" id="graduationYearField" placeholder="e.g. 2020">
+                </div>
+                <div class="form-group">
+                    <label for="batchField">Batch</label>
+                    <input type="text" id="batchField" placeholder="e.g. Batch of 2020">
+                </div>
+                <div class="form-group" id="departmentGroup" style="display:none">
+                    <label for="departmentField">Department</label>
+                    <input type="text" id="departmentField" placeholder="e.g. Computer Science">
+                </div>
+                <div class="form-group" id="interestsGroup" style="display:none">
+                    <label for="interestsField">Areas of Interest (comma separated)</label>
+                    <input type="text" id="interestsField" placeholder="e.g. AI,Web Development">
+                </div>
+                <div class="form-group">
+                    <label>Bio / Headline</label>
+                    <textarea id="bioField" rows="4" placeholder="Briefly describe your background or interests..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>LinkedIn Profile URL</label>
+                    <input type="url" id="linkedinField" placeholder="https://linkedin.com/in/yourprofile">
+                </div>
+                <button class="btn-save" id="saveProfessionalBtn">Save Profile Info</button>
+            </div>
+
+            <div id="uploads" class="content-section">
+                <h2>Uploads</h2>
+                <div id="uploadInstructions" class="text-sm text-gray-600 mb-4"></div>
+                <div class="form-group">
+                    <input type="file" id="uploadFilesInput" multiple style="display:none" />
+                    <button id="selectFilesBtn" class="btn-save">Select Files</button>
+                </div>
+                <div id="uploadedList" class="mt-4 space-y-2"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching Logic
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function goBack() {
+            const type = localStorage.getItem('userType');
+            window.location.href = type === 'alumni' ? 'alumni-dashboard.html' : 'student-dashboard.html';
+        }
+
+        // Optional: Fetch existing data on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = localStorage.getItem('userId');
+            const token = localStorage.getItem('token');
+            const previewImg = document.getElementById('preview');
+            const changeBtn = document.getElementById('changePhotoBtn');
+            const fileInput = document.getElementById('profilePictureInput');
+
+            if(!userId || !token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Load existing profile image (prefer user-scoped localStorage)
+            try {
+                const stored = localStorage.getItem(`profileImage_${userId}`) || localStorage.getItem('profileImage');
+                if (stored) previewImg.src = stored;
+            } catch (e) { console.warn('localStorage read failed', e); }
+
+            // Fetch server-side profile image if not present locally
+            (async function loadFromServer(){
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/users/${userId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const user = await res.json();
+                        if (user.profileImage) previewImg.src = user.profileImage;
+                        document.getElementById('fullName').value = user.fullName || '';
+                        document.getElementById('displayEmail').value = user.email || '';
+                        // populate profile fields if available
+                        document.getElementById('professionField').value = user.profession || '';
+                        document.getElementById('graduationYearField').value = user.graduationYear || '';
+                        document.getElementById('batchField').value = user.batch || '';
+                        // working/company fields removed from profile section
+                        document.getElementById('bioField').value = user.bio || '';
+                        document.getElementById('linkedinField').value = user.linkedin || '';
+                        // student-specific fields
+                        const departmentGroup = document.getElementById('departmentGroup');
+                        const interestsGroup = document.getElementById('interestsGroup');
+                        if (user.userType === 'student') {
+                            departmentGroup.style.display = 'block';
+                            interestsGroup.style.display = 'block';
+                            document.getElementById('departmentField').value = user.department || '';
+                            document.getElementById('interestsField').value = (user.areaOfInterest||[]).join(',');
+                            // hide alumni-only fields
+                            // originally hid alumni-only fields here; removed working/company fields
+                        }
+
+                        // load existing uploads (certificates or gallery)
+                        loadExistingUploads(user.userType);
+                    }
+                } catch (err) { console.warn('Could not fetch profile from server', err); }
+            })();
+
+            // Wire up Change Photo button and file input
+            if (changeBtn && fileInput) {
+                changeBtn.addEventListener('click', (e) => { e.preventDefault(); fileInput.click(); });
+
+                fileInput.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    // Compress image using canvas
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = async () => {
+                            const maxDim = 400;
+                            let width = img.width, height = img.height;
+                            if (width > maxDim || height > maxDim) {
+                                const scale = Math.min(maxDim/width, maxDim/height);
+                                width = Math.round(width * scale);
+                                height = Math.round(height * scale);
+                            }
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width; canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            const compressed = canvas.toDataURL('image/jpeg', 0.75);
+
+                            // Upload to backend
+                            try {
+                                const updateRes = await fetch(`${BACKEND_URL}/api/users/${userId}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({ profileImage: compressed })
+                                });
+                                if (!updateRes.ok) {
+                                    const errData = await updateRes.json().catch(()=>({message:'Unknown error'}));
+                                    throw new Error(errData.message || 'Failed to update profile image');
+                                }
+
+                                // Update preview + localStorage
+                                previewImg.src = compressed;
+                                try { localStorage.setItem(`profileImage_${userId}`, compressed); localStorage.removeItem('profileImage'); } catch(e){console.warn('localStorage set failed', e)}
+                                alert('Profile picture updated successfully');
+
+                                // Also update other open pages by dispatching a storage event (for same-tab listeners)
+                                try { window.dispatchEvent(new Event('storage')); } catch(e){}
+
+                            } catch (err) {
+                                console.error(err);
+                                alert('Failed to upload image: ' + err.message);
+                            }
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // Profile info (formerly professional) form handling
+            const profBtn = document.getElementById('saveProfessionalBtn'); // button remains same id for compatibility
+            if (profBtn) {
+                profBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const payload = {
+                        profession: document.getElementById('professionField').value,
+                        graduationYear: document.getElementById('graduationYearField').value,
+                        batch: document.getElementById('batchField').value,
+                        bio: document.getElementById('bioField').value,
+                        linkedin: document.getElementById('linkedinField').value
+                    };
+                    // include student-specific data if visible
+                    if (document.getElementById('departmentGroup').style.display === 'block') {
+                        payload.department = document.getElementById('departmentField').value;
+                        const interests = document.getElementById('interestsField').value.split(',').map(s=>s.trim()).filter(s=>s);
+                        payload.areaOfInterest = interests;
+                    }
+                    try {
+                        const res2 = await fetch(`${BACKEND_URL}/api/users/${userId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type':'application/json','Authorization':`Bearer ${token}` },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!res2.ok) {
+                            const errText = await res2.text().catch(()=>'');
+                            alert('Failed to save profile info: '+errText);
+                        } else {
+                            alert('Profile details updated');
+                        }
+                    } catch(err){ console.error(err); alert('Error saving profile info'); }
+                });
+            }
+
+            // Setup uploads area
+            const uploadInput = document.getElementById('uploadFilesInput');
+            const selectBtn = document.getElementById('selectFilesBtn');
+            const uploadedList = document.getElementById('uploadedList');
+            let currentType = localStorage.getItem('userType');
+            const instr = document.getElementById('uploadInstructions');
+            if (instr) {
+                if (currentType === 'student') instr.textContent = 'Upload your certificates (PDF, images, etc.) for alumni to view.';
+                else instr.textContent = 'Upload photos/docs to your gallery for others to see.';
+            }
+
+            async function loadExistingUploads(type) {
+                const endpoint = type === 'student' ? 'certificates' : 'gallery';
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/users/${userId}/${endpoint}`);
+                    if (res.ok) {
+                        const list = await res.json();
+                        uploadedList.innerHTML = '';
+                        list.forEach(item => {
+                            const link = document.createElement('div');
+                            link.innerHTML = `<a href="${item.url}" target="_blank" class="text-blue-600 hover:underline">${item.name}</a>`;
+                            uploadedList.appendChild(link);
+                        });
+                    }
+                } catch(e){ console.warn('Could not load uploads',e); }
+            }
+
+            selectBtn.addEventListener('click', e=>{ e.preventDefault(); uploadInput.click(); });
+            uploadInput.addEventListener('change', async (e)=>{
+                const files = Array.from(e.target.files);
+                for (const file of files) {
+                    const reader = new FileReader();
+                    reader.onload = async ev => {
+                        const url = ev.target.result;
+                        const name = file.name;
+                        const endpoint = currentType === 'student' ? 'certificates' : 'gallery';
+                        try {
+                            const res = await fetch(`${BACKEND_URL}/api/users/${userId}/${endpoint}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type':'application/json','Authorization':`Bearer ${token}` },
+                                body: JSON.stringify({ name, url })
+                            });
+                            if (res.ok) {
+                                const updated = await res.json();
+                                // re-render list
+                                uploadedList.innerHTML = '';
+                                updated.forEach(item => {
+                                    const div = document.createElement('div');
+                                    div.innerHTML = `<a href="${item.url}" target="_blank" class="text-blue-600 hover:underline">${item.name}</a>`;
+                                    uploadedList.appendChild(div);
+                                });
+                            } else {
+                                const txt = await res.text();
+                                if (res.status === 401) alert('Upload failed: Unauthorized. Please log in again.');
+                                else if (res.status === 413) alert('Upload failed: File too large. Try a smaller file.');
+                                else alert('Upload failed ('+res.status+'): '+txt);
+                            }
+                        } catch(err){ console.error('Upload error', err); alert('Upload error'); }
+                    };
+                    reader.readAsDataURL(file);
+                }
+                uploadInput.value = null;
+            });
+
+            // Security form handling
+            const securityForm = document.getElementById('securityForm');
+            if (securityForm) {
+                securityForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const currentPassword = document.getElementById('currentPassword').value.trim();
+                    const newPassword = document.getElementById('newPassword').value.trim();
+                    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+                    const msgEl = document.getElementById('securityMsg');
+                    msgEl.style.color = '';
+
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                        msgEl.textContent = 'Please fill in all fields.';
+                        msgEl.style.color = 'var(--danger)';
+                        return;
+                    }
+                    if (newPassword.length < 8) {
+                        msgEl.textContent = 'New password must be at least 8 characters.';
+                        msgEl.style.color = 'var(--danger)';
+                        return;
+                    }
+                    if (newPassword !== confirmPassword) {
+                        msgEl.textContent = 'Passwords do not match.';
+                        msgEl.style.color = 'var(--danger)';
+                        return;
+                    }
+
+                    const submitBtn = securityForm.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Updating...';
+
+                    try {
+                        const res = await fetch(`${BACKEND_URL}/api/users/${userId}/password`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ currentPassword, newPassword })
+                        });
+                        const data = await res.json().catch(() => ({}));
+                        if (!res.ok) {
+                            throw new Error(data.message || 'Could not update password');
+                        }
+                        msgEl.textContent = 'Password updated successfully.';
+                        msgEl.style.color = 'green';
+                        securityForm.reset();
+                    } catch (err) {
+                        msgEl.textContent = err.message || 'Update failed';
+                        msgEl.style.color = 'var(--danger)';
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Update Password';
+                    }
+                });
+
+                const showCb = document.getElementById('showPasswords');
+                showCb && showCb.addEventListener('change', (e) => {
+                    const type = e.target.checked ? 'text' : 'password';
+                    ['currentPassword','newPassword','confirmPassword'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.type = type;
+                    });
+                });
+
+                // Password strength evaluation
+                const newPwInput = document.getElementById('newPassword');
+                const pwLabel = document.getElementById('pwStrengthLabel');
+                const pwFill = document.querySelector('.pw-meter-fill');
+                const rules = {
+                    length: document.getElementById('rule-length'),
+                    upper: document.getElementById('rule-upper'),
+                    lower: document.getElementById('rule-lower'),
+                    number: document.getElementById('rule-number'),
+                    special: document.getElementById('rule-special')
+                };
+
+                function evaluatePassword(pw) {
+                    if (!pwFill || !pwLabel) return;
+                    const checks = {
+                        length: pw.length >= 8,
+                        upper: /[A-Z]/.test(pw),
+                        lower: /[a-z]/.test(pw),
+                        number: /\d/.test(pw),
+                        special: /[^A-Za-z0-9]/.test(pw)
+                    };
+                    let score = 0; for (const k in checks) if (checks[k]) score++;
+
+                    // Update rule indicators
+                    Object.entries(checks).forEach(([k,v]) => {
+                        const el = rules[k];
+                        if (!el) return;
+                        el.textContent = v ? '✔' : '◻︎';
+                        el.style.color = v ? '#10b981' : 'var(--muted)';
+                    });
+
+                    const percent = Math.round((score/5)*100);
+                    pwFill.style.width = percent + '%';
+
+                    // Update label & color
+                    if (percent < 40) {
+                        pwLabel.textContent = 'Very Weak';
+                        pwFill.style.background = 'linear-gradient(90deg,#ef4444,#f97316)';
+                    } else if (percent < 60) {
+                        pwLabel.textContent = 'Weak';
+                        pwFill.style.background = 'linear-gradient(90deg,#f97316,#f59e0b)';
+                    } else if (percent < 80) {
+                        pwLabel.textContent = 'Good';
+                        pwFill.style.background = 'linear-gradient(90deg,#f59e0b,#10b981)';
+                    } else {
+                        pwLabel.textContent = 'Strong';
+                        pwFill.style.background = 'linear-gradient(90deg,#10b981,#06b6d4)';
+                    }
+                }
+
+                newPwInput && newPwInput.addEventListener('input', (e) => evaluatePassword(e.target.value));
+                // initialize
+                evaluatePassword(newPwInput ? newPwInput.value : '');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:inmemory": "SET USE_IN_MEMORY_DB=true && node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "firebase-admin": "^13.5.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb-memory-server": "^9.0.0",
+    "mongoose": "^8.20.2",
+    "socket.io": "^4.8.3"
+  }
+}

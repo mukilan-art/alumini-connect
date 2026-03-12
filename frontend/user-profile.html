@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumnus Profile</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        #dashboard-layout { min-height: 100vh; }
+        .sidebar-link { transition: all 0.2s; }
+        .sidebar-link:hover { background-color: #1e3a8a; transform: translateX(5px); }
+    </style>
+</head>
+<body class="antialiased">
+    <script src="config.js"></script>
+    <div id="dashboard-layout" class="flex">
+        <aside class="w-64 bg-blue-900 text-white flex flex-col fixed h-full shadow-lg">
+            <div class="p-6 border-b border-blue-700">
+                <h2 class="text-2xl font-extrabold tracking-wider">Alumni Connect</h2>
+            </div>
+
+            <nav class="flex-grow p-4 space-y-2">
+                <a href="student-dashboard.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🏠 Dashboard
+                </a>
+                <a href="user-profile.html" class="sidebar-link block py-3 px-4 rounded-lg bg-blue-700 font-semibold">
+                    👤 My Profile
+                </a>
+                <a href="chat.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    💬 Messages
+                </a>
+                <a href="send-mentorship.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🎓 Mentorship
+                </a>
+                <a href="latest-news.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    📰 Latest News
+                </a>
+                <a href="edit-profile.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    ✏️ Edit Profile
+                </a>
+                <a href="search-page.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🔍 Search Alumni
+                </a>
+                <a href="view-events.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    📅 Events
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-blue-700">
+                <button id="logoutButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-lg transition-colors duration-300">
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-64 p-8 flex justify-center items-start">
+            <div class="relative w-full max-w-xl">
+                <div class="profile-card bg-white rounded-2xl shadow-xl pt-20 pb-10 px-8">
+                    <div id="loading" class="text-gray-500 text-lg">Loading profile...</div>
+                    
+                    <div id="profileContent" class="space-y-6" style="display: none;">
+                        <div class="flex flex-col items-center">
+                            <img id="profileImage" src="https://via.placeholder.com/120/3498db/FFFFFF?text=A" alt="Profile Image" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg -mt-16">
+                            <h1 class="text-2xl font-semibold text-gray-800 mt-2" id="fullName"></h1>
+                            <p class="text-sm text-gray-600 italic" id="profession"></p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <span class="block text-xs text-gray-500">Graduation Year</span>
+                                <span class="font-medium text-gray-800" id="graduationYear"></span>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <span class="block text-xs text-gray-500">Batch</span>
+                                <span class="font-medium text-gray-800" id="batch"></span>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <span class="block text-xs text-gray-500">Major</span>
+                                <span class="font-medium text-gray-800" id="major"></span>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg student-only" style="display:none;">
+                                <span class="block text-xs text-gray-500">Department</span>
+                                <span class="font-medium text-gray-800" id="department"></span>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg student-only" style="display:none;">
+                                <span class="block text-xs text-gray-500">Areas of Interest</span>
+                                <span class="font-medium text-gray-800" id="interests"></span>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg alumni-only">
+                                <span class="block text-xs text-gray-500">Working Field</span>
+                                <span class="font-medium text-gray-800" id="workingField"></span>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg sm:col-span-2 alumni-only">
+                                <span class="block text-xs text-gray-500">Company</span>
+                                <span class="font-medium text-gray-800" id="companyName"></span>
+                            </div>
+                        </div>
+
+                        <div class="bio-section text-left">
+                            <h3 class="text-blue-600 font-semibold border-b pb-1 mb-2">About Me</h3>
+                            <p class="text-gray-700" id="bio">No bio provided yet.</p>
+                        </div>
+                        
+                        <div id="studentUploads" class="mt-6" style="display:none;">
+                            <h3 class="text-blue-600 font-semibold border-b pb-1 mb-2">Certificates</h3>
+                            <div id="certList" class="space-y-1"></div>
+                        </div>
+                        <div id="alumniGallery" class="mt-6" style="display:none;">
+                            <h3 class="text-blue-600 font-semibold border-b pb-1 mb-2">Gallery</h3>
+                            <div id="galleryList" class="space-y-1"></div>
+                        </div>
+
+                    </div>
+                    
+                    <div id="error" class="text-red-500" style="display: none;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Early authentication check - runs BEFORE page loads
+        (function() {
+            const token = localStorage.getItem('token');
+            const userType = localStorage.getItem('userType');
+            const userId = localStorage.getItem('userId');
+
+            // Redirect immediately if not logged in
+            if (!token || !userId) {
+                window.location.href = userType === 'alumni' ? 'alumnilogin.html' : 'studentlogin.html';
+                return;
+            }
+
+            // If userType is missing or invalid, go to appropriate login
+            if (userType !== 'student' && userType !== 'alumni') {
+                localStorage.clear();
+                window.location.href = 'index2.html';
+                return;
+            }
+        })();
+
+        // Use the global BACKEND_URL from config.js if available
+        const API_URL = (typeof window.BACKEND_URL !== 'undefined') ? window.BACKEND_URL : 'http://localhost:5000';
+        const userType = localStorage.getItem('userType');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update navigation based on user type
+            updateNavigation();
+            fetchProfile();
+        });
+
+        function updateNavigation() {
+            const nav = document.querySelector('nav');
+            const dashboardLink = nav.querySelector('a[href*="dashboard"]');
+
+            if (userType === 'alumni') {
+                // Update dashboard link for alumni
+                if (dashboardLink) {
+                    dashboardLink.href = 'alumni-dashboard.html';
+                }
+
+                // Update navigation menu for alumni
+                nav.innerHTML = `
+                    <a href="alumni-dashboard.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        🏠 Dashboard
+                    </a>
+                    <a href="user-profile.html" class="sidebar-link block py-3 px-4 rounded-lg bg-blue-700 font-semibold">
+                        👤 My Profile
+                    </a>
+                    <a href="chat.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        💬 Messages
+                    </a>
+                    <a href="requests.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        🎓 Mentorship Requests
+                    </a>
+                    <a href="latest-news.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        📰 Latest News
+                    </a>
+                    <a href="student-connections.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        🔗 Find Connections
+                    </a>
+                    <a href="edit-profile.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        ✏️ Edit Profile
+                    </a>
+                    <a href="profile-settings.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        ⚙️ Profile Settings
+                    </a>
+                `;
+            } else if (userType === 'student') {
+                // Update dashboard link for student
+                if (dashboardLink) {
+                    dashboardLink.href = 'student-dashboard.html';
+                }
+
+                // Update navigation menu for student
+                nav.innerHTML = `
+                    <a href="student-dashboard.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        🏠 Dashboard
+                    </a>
+                    <a href="user-profile.html" class="sidebar-link block py-3 px-4 rounded-lg bg-blue-700 font-semibold">
+                        👤 My Profile
+                    </a>
+                    <a href="chat.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        💬 Messages
+                    </a>
+                    <a href="view-mentorship.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        🎓 Find Mentors
+                    </a>
+                    <a href="student-connections.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        🔗 Alumni Connections
+                    </a>
+                    <a href="latest-news.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        📰 Latest News
+                    </a>
+                    <a href="view-jobs.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        💼 Job Postings
+                    </a>
+                    <a href="edit-profile.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        ✏️ Edit Profile
+                    </a>
+                    <a href="profile-settings.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        ⚙️ Profile Settings
+                    </a>
+                    <a href="search-page.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        🔍 Search Alumni
+                    </a>
+                    <a href="view-events.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                        📅 Events
+                    </a>
+                `;
+            }
+        }
+
+
+        function getUserIdFromUrl() {
+            // First check URL parameter (for viewing other users' profiles)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlUserId = urlParams.get('userId');
+            // If no URL parameter, use the current logged-in user's ID from localStorage
+            return urlUserId || localStorage.getItem('userId');
+        }
+
+        async function fetchProfile() {
+            const userId = getUserIdFromUrl();
+            const token = localStorage.getItem('token');
+            
+            const loading = document.getElementById('loading');
+            const profileContent = document.getElementById('profileContent');
+            const errorElement = document.getElementById('error');
+            
+            loading.style.display = 'block';
+            profileContent.style.display = 'none';
+            errorElement.style.display = 'none';
+
+            if (!userId || !token) {
+                errorElement.innerText = "Error: User ID or authentication token is missing. Please log in again.";
+                errorElement.style.display = 'block';
+                loading.style.display = 'none';
+                return;
+            }
+
+            try {
+                console.log('Fetching profile for userId:', userId, 'from URL:', API_URL);
+                const response = await fetch(`${API_URL}/api/users/${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+
+                if (response.ok) {
+                    const user = await response.json();
+                    console.log('Profile data received:', user);
+                    displayProfile(user);
+                    profileContent.style.display = 'block';
+                } else {
+                    let errorMsg = 'Unknown error';
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.message || response.statusText;
+                    } catch (e) {
+                        errorMsg = response.statusText || 'Server error';
+                    }
+                    
+                    if (response.status === 404) {
+                        errorElement.innerText = "Error: Alumnus profile not found.";
+                    } else if (response.status === 401 || response.status === 403) {
+                        errorElement.innerText = "Error: Authentication failed. Please log in again.";
+                    } else {
+                        errorElement.innerText = `Error fetching profile: ${errorMsg}`;
+                    }
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                errorElement.innerText = "Network error. Could not connect to the server. Make sure the backend is running at " + API_URL;
+                errorElement.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayProfile(user) {
+            document.getElementById('fullName').innerText = user.fullName || 'N/A';
+            document.getElementById('graduationYear').innerText = user.graduationYear || 'N/A';
+            document.getElementById('batch').innerText = user.batch || 'N/A';
+            document.getElementById('major').innerText = user.major || 'N/A';
+            document.getElementById('bio').innerText = user.bio || (user.userType === 'student' ? 'The student has not provided a bio yet.' : 'The alumnus has not provided a personal bio yet.');
+
+            // hide/show type-specific elements
+            const isStudent = user.userType === 'student';
+            document.querySelectorAll('.student-only').forEach(el=> el.style.display = isStudent ? 'block' : 'none');
+            document.querySelectorAll('.alumni-only').forEach(el=> el.style.display = isStudent ? 'none' : 'block');
+            // handle profession element
+            const profElem = document.getElementById('profession');
+            if (profElem) {
+                profElem.style.display = isStudent ? 'none' : 'block';
+                profElem.innerText = isStudent ? '' : (user.profession || 'Profession not listed');
+            }
+
+            if (isStudent) {
+                document.getElementById('department').innerText = user.department || 'N/A';
+                document.getElementById('interests').innerText = (user.areaOfInterest||[]).join(', ') || 'N/A';
+                // load certificates
+                const certSection = document.getElementById('studentUploads');
+                certSection.style.display = 'block';
+                const list = document.getElementById('certList');
+                list.innerHTML = '';
+                (user.certificates||[]).forEach(c=>{
+                    const d = document.createElement('div');
+                    d.innerHTML = `<a href="${c.url}" target="_blank" class="text-blue-600 hover:underline">${c.name}</a>`;
+                    list.appendChild(d);
+                });
+            } else {
+                const gallerySection = document.getElementById('alumniGallery');
+                gallerySection.style.display = 'block';
+                const list = document.getElementById('galleryList');
+                list.innerHTML = '';
+                (user.gallery||[]).forEach(item=>{
+                    const d = document.createElement('div');
+                    d.innerHTML = `<a href="${item.url}" target="_blank" class="text-blue-600 hover:underline">${item.name}</a>`;
+                    list.appendChild(d);
+                });
+                // also display profession for alumni
+                document.getElementById('profession').innerText = user.profession || 'Profession not listed';
+                document.getElementById('workingField').innerText = user.workingField || 'N/A';
+                document.getElementById('companyName').innerText = user.companyName || 'N/A';
+            }
+
+            // Set image placeholder based on name initial if profileImage is missing
+            const imageElement = document.getElementById('profileImage');
+            if (user.profileImage) {
+                 imageElement.src = user.profileImage;
+            } else {
+                const initial = user.fullName ? user.fullName[0].toUpperCase() : 'A';
+                imageElement.src = `https://via.placeholder.com/120/3498db/FFFFFF?text=${initial}`;
+            }
+        }
+
+        // logout handler (shared pattern)
+        document.getElementById('logoutButton').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userType');
+            window.location.href = userType === 'alumni' ? './alumnilogin.html' : './studentlogin.html';
+        });
+    </script>
+</body>
+</html>

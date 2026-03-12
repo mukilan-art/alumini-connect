@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Information | Alumni Connect</title>
+    <style>
+        :root {
+            --primary-dark: #2c3e50;
+            --accent-blue: #3498db;
+            --bg-gray: #f4f7f6;
+            --white: #ffffff;
+            --border-color: #dcdde1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+        body { display: flex; background: var(--bg-gray); min-height: 100vh; }
+
+        /* Sidebar - Same as Dashboard for Consistency */
+        .sidebar {
+            width: 260px;
+            background: var(--primary-dark);
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 { margin-bottom: 30px; text-align: center; color: var(--accent-blue); }
+
+        .nav-links { list-style: none; }
+        .nav-links li { margin-bottom: 15px; }
+        .nav-links a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: block;
+            padding: 12px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .nav-links a:hover { background: var(--accent-blue); }
+        .nav-links a.active { background: var(--accent-blue); }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .form-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 700px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .form-header { margin-bottom: 30px; }
+        .form-header h1 { font-size: 1.8rem; color: var(--primary-dark); }
+        .form-header p { color: #7f8c8d; margin-top: 5px; }
+
+        /* Form Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+            font-size: 0.9rem;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        textarea { height: 200px; resize: vertical; }
+
+        .btn-submit {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover { background: #2980b9; transform: translateY(-2px); }
+
+        .btn-submit:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-msg {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status-msg.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-msg.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #1565c0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 200px; }
+            .main-content { margin-left: 200px; padding: 20px; }
+            .form-card { padding: 20px; }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar { width: 100%; position: relative; height: auto; padding: 15px; }
+            .main-content { margin-left: 0; padding: 15px; }
+            .form-card { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Connect+</h2>
+        <ul class="nav-links">
+            <li><a href="alumni-dashboard.html">🏠 Dashboard</a></li>
+            <li><a href="view-posts.html">📰 View Posts</a></li>
+            <li><a href="post-information.html" class="active">✍️ Share Information</a></li>
+            <li><a href="profile-settings.html">⚙️ Settings</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="form-card">
+            <div class="form-header">
+                <h1>Share Information</h1>
+                <p>Post updates, career advice, or insights with your connected students.</p>
+            </div>
+
+            <div class="info-box">
+                📢 Your posts will only be visible to students who are connected with you.
+            </div>
+
+            <form id="postForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="title">Post Title</label>
+                        <input type="text" id="title" placeholder="e.g. Career Tips for Tech Interviews" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="General Update">General Update</option>
+                            <option value="Career Advice">Career Advice</option>
+                            <option value="Industry News">Industry News</option>
+                            <option value="Mentorship Tips">Mentorship Tips</option>
+                            <option value="Event Announcement">Event Announcement</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content">Content</label>
+                        <textarea id="content" placeholder="Share your thoughts, insights, or information here. Be detailed and helpful!" required></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Publish Post</button>
+                <div id="status" class="status-msg"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // Check authentication and user type
+        let currentUserName = 'Anonymous Alumni';
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            const userType = localStorage.getItem('userType');
+
+            if (!token || !userId) {
+                window.location.href = 'alumnilogin.html';
+                return;
+            }
+
+            if (userType !== 'alumni') {
+                document.getElementById('status').style.display = 'block';
+                document.getElementById('status').classList.add('error');
+                document.getElementById('status').innerText = 'Only alumni can post information.';
+                document.querySelector('.btn-submit').disabled = true;
+            }
+            
+            // Fetch user's full name
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+            try {
+                const res = await fetch(`${API_URL}/api/users/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const user = await res.json();
+                    currentUserName = user.fullName || 'Anonymous Alumni';
+                }
+            } catch (err) {
+                console.error('Could not fetch user details:', err);
+            }
+        });
+
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const status = document.getElementById('status');
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+
+            const postData = {
+                title: document.getElementById('title').value.trim(),
+                content: document.getElementById('content').value.trim(),
+                category: document.getElementById('category').value,
+                author: currentUserName
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/news`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    status.style.display = 'block';
+                    status.classList.remove('error');
+                    status.classList.add('success');
+                    status.innerText = '✓ ' + (data.message || 'Post published successfully!');
+                    
+                    // Reset form
+                    document.getElementById('postForm').reset();
+                    
+                    // Redirect after 2 seconds
+                    setTimeout(() => window.location.href = 'alumni-dashboard.html', 2000);
+                } else {
+                    throw new Error(data.message || 'Failed to post');
+                }
+            } catch (error) {
+                status.style.display = 'block';
+                status.classList.remove('success');
+                status.classList.add('error');
+                status.innerText = '✗ Error: ' + error.message;
+                console.error('Post error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

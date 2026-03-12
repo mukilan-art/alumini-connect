@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Dashboard | Connect</title>
+    <style>
+        /* CSS COMBINED & MODERNIZED */
+        :root {
+            --primary-dark: #1e3a8a;
+            --accent-blue: #2563eb;
+            --success-green: #10b981;
+            --text-light: #f3f4f6;
+            --bg-gray: #f9fafb;
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            --card-shadow-hover: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body { display: flex; background: var(--bg-gray); min-height: 100vh; }
+
+        /* Sidebar Navigation - Professional Design */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1a2f5a 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .sidebar h2 { 
+            padding: 24px 20px; 
+            text-align: center; 
+            color: #ffffff;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links { 
+            list-style: none; 
+            flex-grow: 1; 
+            padding: 12px 0;
+        }
+
+        .nav-links li { margin: 0; }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover { 
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+            border-left-color: var(--accent-blue);
+            padding-left: 17px;
+        }
+
+        .nav-links a.active {
+            background: var(--accent-blue);
+            color: white;
+            border-left-color: #ffffff;
+            padding-left: 17px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            margin: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .logout-btn:hover { 
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            width: calc(100% - 280px);
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border-bottom: 3px solid var(--accent-blue);
+        }
+
+        .welcome-msg { 
+            display: flex; 
+            align-items: center; 
+            gap: 24px;
+            flex: 1;
+        }
+
+        .welcome-msg h1 { 
+            font-size: 2rem; 
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+
+        .welcome-msg p {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        /* Dashboard Stats/Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            border-top: 4px solid var(--accent-blue);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 { 
+            color: #9ca3af; 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card p { 
+            font-size: 2.5rem; 
+            font-weight: 700; 
+            color: var(--primary-dark); 
+            margin-top: 12px;
+        }
+
+        /* Quick Action Cards */
+        .actions-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            margin-bottom: 40px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid var(--accent-blue);
+            transition: all 0.3s;
+        }
+
+        .action-card:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-5px);
+        }
+
+        .action-card h2 { 
+            margin-bottom: 12px; 
+            color: var(--primary-dark);
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .action-card p { 
+            color: #6b7280; 
+            margin-bottom: 20px; 
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .btn-action {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--accent-blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .btn-action:hover { 
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Notification bell */
+        .header-actions { 
+            display: flex; 
+            gap: 12px; 
+            align-items: center;
+        }
+
+        .notif { position: relative; }
+
+        .notif-btn { 
+            background: transparent; 
+            border: none; 
+            font-size: 24px; 
+            cursor: pointer; 
+            position: relative; 
+            padding: 8px; 
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .notif-btn:hover { 
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .notif-count { 
+            position: absolute; 
+            top: 0; 
+            right: 0; 
+            background: #ef4444; 
+            color: white; 
+            font-size: 12px; 
+            padding: 2px 6px; 
+            border-radius: 999px; 
+            font-weight: 700;
+        }
+
+        .notif-dropdown { 
+            position: absolute; 
+            right: 0; 
+            top: 42px; 
+            width: 340px; 
+            max-height: 380px; 
+            overflow-y: auto; 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15); 
+            border: 1px solid rgba(0,0,0,0.06);
+            z-index: 100;
+        }
+
+        .notif-item { 
+            padding: 16px; 
+            border-bottom: 1px solid #f3f4f6; 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .notif-item:hover {
+            background: #f9fafb;
+        }
+
+        .notif-item.unread { 
+            background: #eff6ff; 
+            font-weight: 700;
+        }
+
+        .notif-item p { 
+            margin: 4px 0; 
+            color: #475569; 
+            font-size: 0.95rem;
+        }
+
+        .notif-empty { 
+            padding: 20px; 
+            color: #9ca3af; 
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .actions-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 260px;
+            }
+
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .welcome-msg {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Alumni Connect</h2>
+        <ul class="nav-links">
+            <li><a href="#" class="active">🏠 Dashboard</a></li>
+            <li><a href="user-profile.html">👤 My Profile</a></li>
+            <li><a href="chat.html">💬 Messages</a></li>
+            <li><a href="requests.html">🎓 Mentorship Requests</a></li>
+            <li><a href="latest-news.html">📰 Latest News</a></li>
+            <li><a href="student-connections.html">🔗 Find Connections</a></li>
+            <li><a href="edit-profile.html">✏️ Edit Profile</a></li>
+            <li><a href="profile-settings.html">⚙️ Profile Settings</a></li>
+        </ul>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="welcome-msg" style="display:flex; align-items:center; gap:16px;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                    <img id="profile-picture-large" src="https://ui-avatars.com/api/?name=Alumni&background=3498db&color=fff" alt="Profile" style="width:72px; height:72px; border-radius:8px; object-fit:cover; border:3px solid #fff; box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:pointer; transition: all 0.3s;">
+                    <a href="edit-profile.html" style="font-size:0.85rem; color:#2563eb; text-decoration:none; transition:0.3s; font-weight:600;">Edit Profile</a>
+                </div>
+                <div>
+                    <h1 style="margin: 0;">Welcome Back, <span id="alumniName" style="color: #2563eb;">Alumni</span>!</h1>
+                    <p style="margin: 8px 0 0 0; color: #6b7280; font-size: 0.95rem;">Empower the next generation with your experience.</p>
+                </div>
+            </div>
+            <!-- Hidden file input for header avatar (triggered by clicking the large avatar) -->
+            <input 
+                type="file" 
+                id="profilePictureInput" 
+                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml" 
+                style="display: none;"
+            />
+
+            <!-- Notification bell -->
+            <div class="header-actions">
+                <div class="notif">
+                    <button id="notifBtn" class="notif-btn" aria-label="Notifications">🔔<span id="notifCount" class="notif-count" style="display:none">0</span></button>
+                    <div id="notifDropdown" class="notif-dropdown" style="display:none">
+                        <div id="notifList"></div>
+                        <div id="notifEmpty" class="notif-empty">No notifications</div>
+                    </div>
+                </div>
+                <button id="openChatPrompt" class="notif-btn" title="Open Chat">💬</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Students Mentored</h3>
+                <p id="mentorCount">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Posts Created</h3>
+                <p id="postsCount">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Network Connections</h3>
+                <p id="networkCount">Loading...</p>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <div class="action-card">
+                <h2>Share an Update</h2>
+                <p>Post news, industry insights, or campus memories to the community feed.</p>
+                <a href="post-information.html" class="btn-action">Create Post</a>
+            </div>
+            <div class="action-card">
+                <h2>Pending Requests</h2>
+                <p>Review student mentorship and connection requests.</p>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <a href="requests.html" class="btn-action" style="background: var(--success-green);">View Requests</a>
+                    <button id="openMentorModal" class="btn-action" style="background: #10b981; border:none; cursor:pointer;">Create Request</button>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Mentorship Modal -->
+        <div id="mentorshipModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:50;">
+            <div style="background:white; width:95%; max-width:520px; margin:auto; padding:24px; border-radius:12px; box-shadow:0 6px 30px rgba(2,6,23,0.2);">
+                <h3 style="margin-top:0;">Create Mentorship Request</h3>
+                <p style="color:#475569; margin-bottom:12px;">Send an invitation to a student by email or student ID.</p>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <input id="menteeEmail" type="email" placeholder="Student email (preferred)" style="padding:10px;border:1px solid #e6eef6;border-radius:8px;">
+                    <div style="text-align:center;color:#94a3b8;">— or —</div>
+                    <input id="menteeId" type="text" placeholder="Student ID (optional)" style="padding:10px;border:1px solid #e6eef6;border-radius:8px;">
+                    <input id="menteeSubject" type="text" placeholder="Subject (e.g., Career Guidance in AI)" style="padding:10px;border:1px solid #e6eef6;border-radius:8px;">
+                    <textarea id="menteeMessage" rows="4" placeholder="Write a short message..." style="padding:10px;border:1px solid #e6eef6;border-radius:8px;"></textarea>
+                    <div style="display:flex; gap:10px; justify-content:flex-end;">
+                        <button id="cancelMentor" class="btn-action" style="background:#64748b;">Cancel</button>
+                        <button id="sendMentor" class="btn-action" style="background:#10b981; border:none;">Send Request</button>
+                    </div>
+                    <div id="mentorMsg" style="min-height:18px;color:#ef4444;font-size:0.95rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Chat Box -->
+    <div id="chat-box" style="display:none; position:fixed; right:20px; bottom:20px; width:340px; max-height:520px; box-shadow:0 8px 40px rgba(2,6,23,0.2); z-index:999; background:white; border-radius:12px; overflow:hidden;">
+        <div style="background:#111827;color:white;padding:10px;display:flex;align-items:center;justify-content:space-between;">
+            <div id="chat-title">Chat</div>
+            <button id="chat-close" style="background:transparent;border:none;color:white;font-size:18px;cursor:pointer">✖</button>
+        </div>
+        <!-- conversation list view -->
+        <div id="conversation-list" style="display:none;padding:12px;height:300px;overflow:auto;background:#f8fafc;"></div>
+    </div>
+
+    <style>
+        .chat-msg { margin-bottom:8px; max-width:80%; }
+        .chat-msg-sent { margin-left:auto; background:#e0f2fe; padding:8px 10px; border-radius:10px; }
+        .chat-msg-recv { margin-right:auto; background:#f1f5f9; padding:8px 10px; border-radius:10px; }
+        .chat-text { font-size:0.95rem; color:#0f172a; }
+        .chat-meta { font-size:0.75rem; color:#64748b; margin-top:6px; text-align:right; }
+    </style>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="config.js"></script>
+    <script src="assets/js/chat.js"></script>
+    <script>
+        document.getElementById('openChatPrompt').addEventListener('click', ()=>{
+            const partnerId = prompt('Enter student/alumni userId to chat with:');
+            if (!partnerId) return;
+            const partnerName = prompt('Enter partner name (optional):') || 'Chat';
+            window.initChatWith(partnerId, partnerName);
+            showChatBox();
+        });
+        document.getElementById('chat-close').addEventListener('click', ()=>{ document.getElementById('chat-box').style.display='none'; });
+
+
+        // helper functions for showing/hiding chat box and fetching conversations
+        async function loadConversationList() {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+            try {
+                const res = await fetch(`${API_URL}/api/conversations/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) throw new Error('Failed to fetch conversations');
+                const convs = await res.json();
+                const listEl = document.getElementById('conversation-list');
+                listEl.innerHTML = '';
+                if (!convs || convs.length === 0) {
+                    listEl.innerHTML = '<div>No messages yet.</div>';
+                } else {
+                    convs.forEach(c => {
+                        // only show if partner is a student (alumni may chat with alumni but we only want student messages)
+                        if (c.partnerType && c.partnerType !== 'student') return;
+                        const item = document.createElement('div');
+                        item.className = 'conversation-item';
+                        item.style.padding = '8px';
+                        item.style.cursor = 'pointer';
+                        item.style.borderBottom = '1px solid #e6eef6';
+                        item.textContent = c.partnerName + (c.lastMessage ? ' – ' + c.lastMessage : '');
+                        item.onclick = () => {
+                            window.initChatWith(c.partnerId, c.partnerName);
+                            showChatBox();
+                        };
+                        listEl.appendChild(item);
+                    });
+                    if (listEl.children.length === 0) {
+                        listEl.innerHTML = '<div>No student messages.</div>';
+                    }
+                }
+            } catch (e) { console.error('Load conversations failed', e); }
+        }
+
+        function showChatBox(showList = false) {
+            const box = document.getElementById('chat-box');
+            box.style.display = 'block';
+            document.getElementById('conversation-list').style.display = showList ? 'block' : 'none';
+            document.getElementById('chat-messages').style.display = showList ? 'none' : 'block';
+            document.getElementById('chat-input').style.display = showList ? 'none' : 'inline-block';
+            document.getElementById('chat-send').style.display = showList ? 'none' : 'inline-block';
+            document.getElementById('chat-title').textContent = showList ? 'Messages' : (window.__currentConversationName || 'Chat');
+        }
+    </script>
+
+    <script>
+        // Check if user is logged in - runs BEFORE everything else
+        (function() {
+            const token = localStorage.getItem('token');
+            const userType = localStorage.getItem('userType');
+            const userId = localStorage.getItem('userId');
+
+            // Redirect immediately if not alumni
+            if (!token || !userId) {
+                window.location.href = 'alumnilogin.html';
+                return;
+            }
+
+            // If logged in but as student, send to student dashboard
+            if (userType === 'student') {
+                localStorage.clear();
+                window.location.href = 'studentlogin.html';
+                return;
+            }
+
+            // If userType is missing or not alumni, go to alumni login
+            if (userType !== 'alumni') {
+                localStorage.clear();
+                window.location.href = 'alumnilogin.html';
+                return;
+            }
+        })();
+
+        // Main dashboard initialization
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            const userType = localStorage.getItem('userType');
+            const userId = localStorage.getItem('userId');
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+
+            // establish socket for realtime notifications and messages
+            let alumniSocket;
+            try {
+                alumniSocket = io(API_URL, { query: { userId } });
+                alumniSocket.on('newNotification', (notif)=>{
+                    // refresh count/list if chat panel is open
+                    if (document.getElementById('conversation-list').style.display === 'block') {
+                        loadConversationList();
+                    }
+                });
+                alumniSocket.on('newMessage', (msg)=>{
+                    if (document.getElementById('conversation-list').style.display === 'block') {
+                        loadConversationList();
+                    }
+                });
+            } catch(e){ console.warn('Socket init failed', e); }
+
+            try {
+                const res = await fetch(`${API_URL}/api/users/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) throw new Error('Failed to fetch profile');
+
+                const user = await res.json();
+
+                // Populate name and avatar
+                const nameEl = document.getElementById('alumniName');
+                const largeAvatarEl = document.getElementById('profile-picture-large');
+                if (nameEl && user.fullName) nameEl.textContent = user.fullName;
+
+                // Prefer a user-scoped locally stored image (set when uploading) then fallback to server image and legacy key
+                let storedPic = null;
+                try { storedPic = localStorage.getItem(`profileImage_${userId}`) || localStorage.getItem('profileImage'); } catch(e) { console.warn('localStorage read failed', e); }
+                const avatarSrc = storedPic || user.profileImage || (user.fullName ? `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=3498db&color=fff` : `https://ui-avatars.com/api/?name=Alumni&background=3498db&color=fff`);
+                if (largeAvatarEl) largeAvatarEl.src = avatarSrc;
+            } catch (err) {
+                console.error('Error loading profile:', err);
+                // If fetching profile fails, clear storage and redirect to login
+                localStorage.clear();
+                alert('Session expired or profile unavailable. Please log in again.');
+                window.location.href = 'alumnilogin.html';
+            }
+
+            // Fetch and display alumni statistics
+            try {
+                // Fetch total alumni count for network connections
+                const countRes = await fetch(`${API_URL}/api/alumni/count`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (countRes.ok) {
+                    const data = await countRes.json();
+                    const networkEl = document.getElementById('networkCount');
+                    if (networkEl) {
+                        networkEl.textContent = data.count;
+                    }
+                }
+
+                // Fetch actual connections count for this alumni (accepted connections)
+                try {
+                    const connRes = await fetch(`${API_URL}/api/connections/count/${userId}`);
+                    if (connRes.ok) {
+                        const d = await connRes.json();
+                        const networkEl = document.getElementById('networkCount');
+                        if (networkEl) networkEl.textContent = d.count || 0;
+                    }
+                } catch(e) { console.warn('Could not fetch connection count', e); }
+
+                // Set mentor count (placeholder - can be updated with actual data)
+                const mentorEl = document.getElementById('mentorCount');
+                if (mentorEl) {
+                    mentorEl.textContent = '0'; // Default to 0, can be fetched from backend
+                }
+
+                // Set posts count (placeholder - can be updated with actual data)
+                const postsEl = document.getElementById('postsCount');
+                if (postsEl) {
+                    postsEl.textContent = '0'; // Default to 0, can be fetched from backend
+                }
+
+                // Mentorship modal handlers
+                const openBtn = document.getElementById('openMentorModal');
+                const modal = document.getElementById('mentorshipModal');
+                const cancelBtn = document.getElementById('cancelMentor');
+                const sendBtn = document.getElementById('sendMentor');
+
+                if (openBtn && modal) {
+                    openBtn.addEventListener('click', () => { modal.style.display = 'flex'; document.getElementById('menteeEmail').focus(); });
+                }
+                if (cancelBtn && modal) {
+                    cancelBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+                }
+
+                if (sendBtn) sendBtn.addEventListener('click', async () => {
+                    const email = document.getElementById('menteeEmail').value.trim();
+                    const menteeId = document.getElementById('menteeId').value.trim();
+                    const subject = document.getElementById('menteeSubject').value.trim();
+                    const message = document.getElementById('menteeMessage').value.trim();
+                    const msgEl = document.getElementById('mentorMsg');
+                    msgEl.style.color = '#ef4444'; msgEl.textContent = '';
+
+                    if (!email && !menteeId) { msgEl.textContent = 'Provide student email or ID.'; return; }
+                    if (!subject) { msgEl.textContent = 'Please add a short subject.'; return; }
+
+                    sendBtn.disabled = true; sendBtn.textContent = 'Sending...';
+                    try {
+                        const token = localStorage.getItem('token');
+                        const userId = localStorage.getItem('userId');
+                        const body = { subject, message };
+                        if (email) body.studentEmail = email; else body.studentId = menteeId;
+
+                        const res = await fetch(`${(typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'http://localhost:5000')}/api/mentorship/request`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify(body)
+                        });
+
+                        const data = await res.json().catch(()=>({}));
+                        if (!res.ok) throw new Error(data.message || 'Failed to send request');
+
+                        msgEl.style.color = 'green';
+                        msgEl.textContent = 'Request sent successfully!';
+                        // Clear form and close after short delay
+                        document.getElementById('menteeEmail').value = '';
+                        document.getElementById('menteeId').value = '';
+                        document.getElementById('menteeSubject').value = '';
+                        document.getElementById('menteeMessage').value = '';
+                        setTimeout(()=>{ modal.style.display='none'; msgEl.textContent=''; }, 1200);
+                    } catch (err) {
+                        msgEl.textContent = err.message || 'Error sending request.';
+                    } finally {
+                        sendBtn.disabled = false; sendBtn.textContent = 'Send Request';
+                    }
+                });
+            } catch (err) {
+                console.error('Error loading statistics:', err);
+            }
+        });
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'alumnilogin.html';
+        }
+
+        // Profile picture upload handler - setup after page loads
+        const largeAvatarEl = document.getElementById('profile-picture-large');
+        const profilePictureInput = document.getElementById('profilePictureInput');
+        
+        if (largeAvatarEl && profilePictureInput) {
+            largeAvatarEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                profilePictureInput.click();
+            });
+        }
+
+        if (profilePictureInput) {
+            profilePictureInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('userId');
+                const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    try {
+                        // Create canvas to compress image
+                        const img = new Image();
+                        img.onload = async () => {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            
+                            // Reduce size if image is too large
+                            const maxWidth = 400;
+                            const maxHeight = 400;
+                            if (width > maxWidth || height > maxHeight) {
+                                const scale = Math.min(maxWidth / width, maxHeight / height);
+                                width *= scale;
+                                height *= scale;
+                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // Compress to JPEG with quality 0.7
+                            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                            
+                            try {
+                                const updateRes = await fetch(`${API_URL}/api/users/${userId}`, {
+                                    method: 'PUT',
+                                    headers: { 
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({ profileImage: compressedBase64 })
+                                });
+
+                                if (!updateRes.ok) {
+                                    const errorData = await updateRes.json();
+                                    throw new Error(errorData.message || 'Failed to update profile picture');
+                                }
+                                
+                                if (largeAvatarEl) largeAvatarEl.src = compressedBase64;
+                                try { localStorage.setItem(`profileImage_${userId}`, compressedBase64); localStorage.removeItem('profileImage'); } catch(e) { console.warn('Could not save profileImage to localStorage', e); }
+                                alert('Profile picture updated successfully!');
+                            } catch (err) {
+                                console.error('Error updating profile picture:', err);
+                                alert('Failed to update profile picture: ' + err.message);
+                            }
+                        };
+                        img.src = event.target.result;
+                    } catch (err) {
+                        console.error('Error processing image:', err);
+                        alert('Error processing image. Please try a different file.');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        /* Notifications */
+        const notifBtn = document.getElementById('notifBtn');
+        const notifDropdown = document.getElementById('notifDropdown');
+        const notifList = document.getElementById('notifList');
+        const notifCountEl = document.getElementById('notifCount');
+        const notifEmpty = document.getElementById('notifEmpty');
+
+        function closeNotifDropdown() {
+            if (notifDropdown) notifDropdown.style.display = 'none';
+        }
+
+        async function fetchUnreadCount() {
+            try {
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('userId');
+                if (!token || !userId) return;
+                const res = await fetch(`${(typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'http://localhost:5000')}/api/notifications/unreadCount/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                updateNotifBadge(data.count || 0);
+            } catch (err) { console.error('Unread count error', err); }
+        }
+
+        function updateNotifBadge(count) {
+            if (!notifCountEl) return;
+            if (count && count > 0) { notifCountEl.style.display = 'inline-block'; notifCountEl.textContent = count; }
+            else { notifCountEl.style.display = 'none'; }
+        }
+
+        async function fetchNotifications() {
+            try {
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('userId');
+                if (!token || !userId) return;
+                const res = await fetch(`${(typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'http://localhost:5000')}/api/notifications/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) { notifList.innerHTML = ''; notifEmpty.style.display = 'block'; return; }
+                const notes = await res.json();
+                if (!notes || notes.length === 0) { notifList.innerHTML = ''; notifEmpty.style.display = 'block'; return; }
+                notifEmpty.style.display = 'none';
+                notifList.innerHTML = notes.map(n => {
+                    const date = new Date(n.createdAt).toLocaleString();
+                    // If notification references a mentorship request, include action buttons
+                    const isMentorship = n.entityType === 'mentorship' && n.entityId;
+                    return `<div class="notif-item ${n.read ? '' : 'unread'}" data-id="${n._id}" data-link="${n.link || ''}" data-entity-type="${n.entityType || ''}" data-entity-id="${n.entityId || ''}">
+                        <div style="font-size:0.95rem;color:#111827">${n.title}</div>
+                        <p>${n.message || ''}</p>
+                        <div style="font-size:0.8rem;color:#9ca3af">${date}</div>
+                        ${isMentorship ? `<div style="margin-top:8px;display:flex;gap:8px"><button class="btn-notif-accept" data-notif-id="${n._id}" data-mentorship-id="${n.entityId}" style="background:#10b981;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer">Accept</button><button class="btn-notif-decline" data-notif-id="${n._id}" data-mentorship-id="${n.entityId}" style="background:#ef4444;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer">Decline</button></div>` : ''}
+                    </div>`;
+                }).join('');
+
+                // Attach click handlers
+                document.querySelectorAll('.notif-item').forEach(el => {
+                    // Handle buttons: Accept / Decline (for mentorship)
+                    const acceptBtn = el.querySelector('.btn-notif-accept');
+                    const declineBtn = el.querySelector('.btn-notif-decline');
+
+                    if (acceptBtn) {
+                        acceptBtn.addEventListener('click', async (ev) => {
+                            ev.stopPropagation();
+                            const notifId = ev.currentTarget.getAttribute('data-notif-id');
+                            const mentorshipId = ev.currentTarget.getAttribute('data-mentorship-id');
+                            await handleMentorshipAction(notifId, mentorshipId, 'Accepted');
+                        });
+                    }
+                    if (declineBtn) {
+                        declineBtn.addEventListener('click', async (ev) => {
+                            ev.stopPropagation();
+                            const notifId = ev.currentTarget.getAttribute('data-notif-id');
+                            const mentorshipId = ev.currentTarget.getAttribute('data-mentorship-id');
+                            await handleMentorshipAction(notifId, mentorshipId, 'Declined');
+                        });
+                    }
+
+                    el.addEventListener('click', async (e) => {
+                        const id = el.getAttribute('data-id');
+                        const link = el.getAttribute('data-link');
+                        try {
+                            await markNotificationRead(id);
+                            // Optionally navigate if link provided
+                            if (link) window.location.href = link;
+                            else {
+                                // Close dropdown after marking read
+                                closeNotifDropdown();
+                            }
+                        } catch (err) {
+                            console.error('Mark read error', err);
+                        }
+                    });
+                });
+
+                // Handlers for mentorship accept/decline from notifications
+                async function handleMentorshipAction(notificationId, mentorshipId, newStatus) {
+                    try {
+                        const token = localStorage.getItem('token');
+                        if (!token) throw new Error('Not authenticated');
+                        const res = await fetch(`${(typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'http://localhost:5000')}/api/mentorship/${mentorshipId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify({ status: newStatus })
+                        });
+                        if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || 'Failed'); }
+                        // Mark the notification read and refresh UI
+                        await markNotificationRead(notificationId);
+                        await fetchUnreadCount();
+                        await fetchNotifications();
+                        alert(`Request ${newStatus}`);
+                    } catch (err) {
+                        console.error('Mentorship action failed', err);
+                        alert('Failed to perform action: ' + (err.message || ''));
+                    }
+                }
+            } catch (err) {
+                console.error('Fetch notifications error', err);
+                notifList.innerHTML = '';
+                notifEmpty.style.display = 'block';
+            }
+        }
+
+        async function markNotificationRead(id) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) throw new Error('No token');
+                const res = await fetch(`${(typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'http://localhost:5000')}/api/notifications/${id}/read`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+                if (!res.ok) throw new Error('Failed to mark read');
+                await fetchUnreadCount();
+                // Refresh list to show read state
+                await fetchNotifications();
+            } catch (err) { console.error('Mark notification read failed', err); }
+        }
+
+        if (notifBtn) {
+            notifBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (notifDropdown.style.display === 'block') { notifDropdown.style.display = 'none'; }
+                else { notifDropdown.style.display = 'block'; fetchNotifications(); }
+            });
+        }
+
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!notifBtn) return;
+            const outside = !notifBtn.contains(e.target) && !notifDropdown.contains(e.target);
+            if (outside) notifDropdown.style.display = 'none';
+        });
+
+        // Poll unread count every 30s
+        setInterval(fetchUnreadCount, 30000);
+        // Initial load
+        fetchUnreadCount();
+
+        // --- Messages / Connections list for quick chat ---
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latest News - Alumni Network</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f2f5; 
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: #2c3e50;
+            padding: 1rem 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 { font-size: 1.5rem; }
+        
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            background: #34495e;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .back-btn:hover { background: #3498db; }
+
+        /* Main Container */
+        .news-container { 
+            max-width: 800px; 
+            margin: 30px auto; 
+            padding: 0 20px;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+            font-size: 2rem;
+            color: #2c3e50;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+        }
+
+        /* News Cards */
+        .news-card { 
+            background: white; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        
+        .news-card:hover { transform: translateY(-3px); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category-tag { 
+            background: #e1f5fe; 
+            color: #0288d1; 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-size: 0.75rem; 
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .date { color: #888; font-size: 0.85rem; }
+
+        .news-card h2 { 
+            margin-bottom: 10px; 
+            color: #2c3e50;
+            font-size: 1.4rem;
+        }
+
+        .news-content {
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .author-info {
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* Loading & Error States */
+        #newsFeed { text-align: center; padding: 50px; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <h1>Alumni Connect</h1>
+        <a href="#" class="back-btn" onclick="goToDashboard()">Dashboard</a>
+    </nav>
+
+    <div class="news-container">
+        <h2 class="page-title">Latest Updates</h2>
+        <div id="newsFeed">
+            <p>Gathering the latest news...</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // Redirect back to the correct dashboard based on stored role
+        function goToDashboard() {
+            const userType = localStorage.getItem('userType');
+            if (userType === 'alumni') {
+                window.location.href = 'alumni-dashboard.html';
+            } else {
+                window.location.href = 'student-dashboard.html';
+            }
+        }
+
+        async function fetchNews() {
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+            const feed = document.getElementById('newsFeed');
+
+            try {
+                const response = await fetch(`${API_URL}/api/news`);
+                const newsItems = await response.json();
+
+                if (!response.ok) throw new Error("Failed to load");
+
+                feed.innerHTML = ''; 
+
+                if (newsItems.length === 0) {
+                    feed.innerHTML = `
+                        <div class="news-card" style="text-align:center;">
+                            <p>No updates have been posted yet. Check back later!</p>
+                        </div>`;
+                    return;
+                }
+
+                newsItems.forEach(item => {
+                    const date = new Date(item.createdAt).toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'short', day: 'numeric'
+                    });
+
+                    feed.innerHTML += `
+                        <div class="news-card">
+                            <div class="card-header">
+                                <span class="category-tag">${item.category || 'General'}</span>
+                                <span class="date">${date}</span>
+                            </div>
+                            <h2>${item.title}</h2>
+                            <div class="news-content">${item.content}</div>
+                            <div class="author-info">
+                                Posted by: ${item.author || 'Anonymous Alumni'}
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error(error);
+                feed.innerHTML = `
+                    <div class="news-card" style="border-left: 5px solid #e74c3c;">
+                        <p><strong>Offline:</strong> Could not connect to the news server. Please ensure the backend is running on port 5000.</p>
+                    </div>`;
+            }
+        }
+
+        window.onload = fetchNews;
+    </script>
+</body>
+</html>

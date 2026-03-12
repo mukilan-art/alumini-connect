@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="config.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Registration</title>
+  <style>
+    /* Base Theme Styles */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      /* --- STUDENT BACKGROUND (Campus/Study) --- */
+      position: relative;
+      background: url("https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1500&q=80") no-repeat center center/cover;
+      color: #333;
+    }
+    /* Dark overlay for better text/card readability */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5); 
+      z-index: 0;
+    }
+    
+    /* Login/Register Box Styling */
+    .container {
+      padding: 40px;
+      border-radius: 12px;
+      /* --- DARK TRANSPARENT BOX STYLE --- */
+      background-color: rgba(0, 0, 0, 0.4); 
+      backdrop-filter: blur(15px); 
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9); 
+      border: 1px solid rgba(255, 255, 255, 0.2); 
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+      z-index: 1; 
+    }
+    
+    .heading {
+      font-size: 2rem;
+      margin-bottom: 25px;
+      font-weight: bold;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+    
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    /* Input Field Styling */
+    .input-field {
+      position: relative;
+    }
+    .input-field label {
+      position: absolute;
+      color: #777; 
+      pointer-events: none;
+      background-color: transparent;
+      left: 15px;
+      transform: translateY(0.6rem);
+      transition: all 0.3s ease;
+    }
+    .input-field input {
+      padding: 15px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: solid 1px #ccc;
+      letter-spacing: 1px;
+      width: 100%;
+      box-sizing: border-box;
+      background-color: rgba(255, 255, 255, 0.95); 
+      color: #333;
+    }
+    .input-field input:focus,
+    .input-field input:valid {
+      outline: none;
+      border: solid 1px #3498db;
+    }
+    .input-field input:focus ~ label,
+    .input-field input:valid ~ label {
+      transform: translateY(-51%) translateX(-10px) scale(0.8);
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 0px 5px;
+      color: #3498db; 
+      font-weight: bold;
+      letter-spacing: 1px;
+      border-radius: 3px;
+    }
+    
+    /* Button Styling */
+    .btn {
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+    .btn:hover {
+      background-color: #2980b9;
+    }
+    
+    /* Text and Link Styling */
+    .acc-text {
+      font-size: 0.9rem;
+      margin-top: 15px;
+      color: #ffffff; 
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+    .acc-text span {
+      color: #66D9FF; 
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .acc-text span:hover {
+      color: #3498db;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="heading">Student Registration</div>
+    <form class="form" id="studentRegisterForm">
+      <div class="input-field">
+        <input required="" autocomplete="off" type="text" name="fullName" id="name" />
+        <label for="name">Full Name</label>
+      </div>
+      <div class="input-field">
+        <input required="" autocomplete="off" type="email" name="email" id="email" />
+        <label for="email">College Email</label>
+      </div>
+      <div class="input-field">
+        <input required="" autocomplete="off" type="password" name="password" id="password" />
+        <label for="password">Password</label>
+      </div>
+      <div class="input-field">
+        <input required="" autocomplete="off" type="password" name="confirmPassword" id="confirmPassword" />
+        <label for="confirmPassword">Confirm Password</label>
+      </div>
+      <button class="btn" type="submit">Register</button>
+    </form>
+    <div class="acc-text">
+      Already have an account?
+      <span onclick="window.location.href='studentlogin.html'">Sign In</span>
+    </div>
+  </div>
+<script src="config.js"></script>
+
+<script>
+  const API_BASE = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+  document.getElementById('studentRegisterForm').addEventListener('submit', async function(event) {
+    // PREVENT REFRESH: Stops the page from clearing its data
+    event.preventDefault(); 
+
+    // Safety check for the config file
+    if (typeof BACKEND_URL === 'undefined') {
+        alert("Configuration Error: config.js not found!");
+        return;
+    }
+
+    // Capture student-specific fields
+    const fullName = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // Check passwords match before talking to the server
+    if (password !== confirmPassword) {
+      alert('Error: Passwords do not match.');
+      return;
+    }
+
+    try {
+      console.log("Attempting to register student at:", `${BACKEND_URL}/api/register`);
+      
+      const response = await fetch(`${BACKEND_URL}/api/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          fullName, 
+          email, 
+          password, 
+          userType: 'student' // Tells the backend to ignore alumni fields
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('✅ Student registered successfully! Redirecting to login...');
+        window.location.href = 'studentlogin.html';
+      } else {
+        alert('❌ Registration Failed: ' + (data.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Network Error:', error);
+      alert('🚨 Network Error: Could not connect to the server. Is Node.js running on port 4000?');
+    }
+  });
+</script>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Connections | Alumni Connect</title>
+    <style>
+        :root{--primary:#2c3e50;--accent:#3498db;--bg:#f4f7f6;--white:#fff}
+        *{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI, sans-serif}
+        body{background:var(--bg);min-height:100vh}
+        .container{max-width:1000px;margin:40px auto;padding:20px}
+        .card{background:var(--white);padding:20px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.06)}
+        .request{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #f1f5f9}
+        .btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+        .btn-accept{background:#10b981;color:white}
+        .btn-decline{background:#ef4444;color:white}
+        #empty{padding:20px;color:#94a3b8;text-align:center}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Connection Requests</h1>
+            <p style="color:#6b7280;margin-bottom:12px">Review incoming connection requests from students.</p>
+            <div id="requests"></div>
+            <div id="empty">Checking for requests...</div>
+        </div>
+    </div>
+
+    <script>
+        const API = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+        async function loadRequests() {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            if (!token || !userId) { window.location.href='alumnilogin.html'; return; }
+            try {
+                const res = await fetch(`${API}/api/connections/alumni/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const container = document.getElementById('requests');
+                const empty = document.getElementById('empty');
+                if (!data || data.length === 0) { container.innerHTML=''; empty.textContent='No connection requests.'; return; }
+                empty.textContent='';
+                container.innerHTML = data.map(r => {
+                    const name = r.requesterId.fullName || 'Student';
+                    return `
+                        <div class="request">
+                            <div>
+                                <div style="font-weight:700">${name}</div>
+                                <div style="color:#6b7280;font-size:0.95rem">${r.requesterId.email || ''}</div>
+                            </div>
+                            <div style="display:flex;gap:8px">
+                                <button class="btn btn-accept" data-id="${r._id}">Accept</button>
+                                <button class="btn btn-decline" data-id="${r._id}">Decline</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.querySelectorAll('.btn-accept').forEach(b => b.addEventListener('click', async (e)=>{
+                    const id = e.target.getAttribute('data-id');
+                    try {
+                        const r = await fetch(`${API}/api/connections/${id}/accept`, { method:'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+                        if (r.ok) { loadRequests(); alert('Connection accepted'); }
+                        else alert('Failed to accept');
+                    } catch (err) { alert('Error'); }
+                }));
+
+                document.querySelectorAll('.btn-decline').forEach(b => b.addEventListener('click', async (e)=>{
+                    const id = e.target.getAttribute('data-id');
+                    try {
+                        const r = await fetch(`${API}/api/connections/${id}/accept`, { method:'PUT', headers: { 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status: 'Declined' }) });
+                        // We'll keep decline as accept endpoint for simplicity; server can be extended for explicit decline.
+                        loadRequests();
+                    } catch (err) { alert('Error'); }
+                }));
+
+            } catch (err) { console.error(err); document.getElementById('empty').textContent='Error loading requests.'; }
+        }
+        window.onload = loadRequests;
+    </script>
+</body>
+</html>

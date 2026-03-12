@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Alumni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        #dashboard-layout {
+            min-height: 100vh;
+        }
+        .sidebar-link {
+            transition: all 0.2s;
+        }
+        .sidebar-link:hover {
+            background-color: #1e3a8a; /* Darker blue on hover */
+            transform: translateX(5px);
+        }
+        .input-group label {
+            font-weight: 600;
+            color: #4b5563; /* Gray-700 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="dashboard-layout" class="flex">
+        <aside class="w-64 bg-blue-900 text-white flex flex-col fixed h-full shadow-lg">
+            <div class="p-6 border-b border-blue-700">
+                <h2 class="text-2xl font-extrabold tracking-wider">Alumni Connect</h2>
+            </div>
+
+            <nav class="flex-grow p-4 space-y-2">
+                <a href="student-dashboard.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🏠 Dashboard
+                </a>
+                <a href="#" class="sidebar-link block py-3 px-4 rounded-lg bg-blue-700 font-semibold">
+                    🔍 Search Alumni
+                </a>
+                <a href="edit-profile.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    👤 Edit Profile
+                </a>
+                <a href="#" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    📰 Latest News
+                </a>
+                <a href="#" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    📅 Events
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-blue-700">
+                <button id="logoutButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-lg transition-colors duration-300">
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-64 p-8">
+            <div class="bg-white p-10 rounded-xl shadow-lg">
+                <h1 class="text-3xl font-bold text-gray-800 border-b pb-4 mb-6">Search Alumni Directory</h1>
+
+                <form id="searchForm" class="grid grid-cols-1 md:grid-cols-4 gap-6 p-4 border border-blue-100 rounded-lg bg-blue-50 mb-8">
+                    <div class="md:col-span-2 input-group">
+                        <label for="keyword" class="block text-sm">Name or Keyword</label>
+                        <input
+                            type="text"
+                            id="keyword"
+                            name="keyword"
+                            placeholder="e.g., John Smith, Software Engineer"
+                            class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700"
+                        >
+                    </div>
+
+                    <div class="input-group">
+                        <label for="major" class="block text-sm">Major / Department</label>
+                        <input
+                            type="text"
+                            id="major"
+                            name="major"
+                            placeholder="e.g., Computer Science"
+                            class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700"
+                        >
+                    </div>
+
+                    <div class="input-group">
+                        <label for="graduationYear" class="block text-sm">Graduation Year</label>
+                        <input
+                            type="number"
+                            id="graduationYear"
+                            name="graduationYear"
+                            placeholder="e.g., 2018"
+                            class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700"
+                        >
+                    </div>
+
+                    <div class="input-group">
+                        <label for="location" class="block text-sm">Location</label>
+                        <input
+                            type="text"
+                            id="location"
+                            name="location"
+                            placeholder="e.g., New York, USA"
+                            class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700"
+                        >
+                    </div>
+
+                    <div class="md:col-span-4 flex justify-end">
+                        <button
+                            type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 shadow-md flex items-center space-x-2"
+                        >
+                            <span>Search Alumni</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                    clip-rule="evenodd"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4" id="resultsHeader">Search Results (0 found)</h2>
+                    <div id="resultsContainer" class="space-y-4">
+                        <p id="noResults" class="text-gray-500 hidden">
+                            Please enter search criteria and click 'Search Alumni' to find matches.
+                        </p>
+
+                        <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center space-x-4 hidden example-result">
+                            <div class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center font-bold text-blue-800">JS</div>
+                            <div>
+                                <p class="font-semibold text-lg text-gray-900">John Smith</p>
+                                <p class="text-sm text-gray-600">
+                                    Software Engineer | Graduated: 2018 | Location: San Francisco
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        let USER_ID = null;
+        const userType = localStorage.getItem('userType');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const searchForm = document.getElementById('searchForm');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsHeader = document.getElementById('resultsHeader');
+
+            // 🛑 REDIRECT CHECK 🛑
+            if (!token || !userType) {
+                window.location.href = userType === 'alumni' ? './alumnilogin.html' : './studentlogin.html';
+                return;
+            }
+
+            // Function to generate an HTML card for a single alumni result
+            const createResultCard = (alumni) => {
+                const card = document.createElement('div');
+                card.className = 'p-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center space-x-4 hover:bg-gray-100 transition-colors cursor-pointer';
+
+                const initials = alumni.fullName ? alumni.fullName.split(' ').map(n => n[0]).join('') : 'AL';
+                const majorText = alumni.major ? alumni.major : 'N/A';
+                const gradYearText = alumni.graduationYear ? `Graduated: ${alumni.graduationYear}` : 'Year N/A';
+                const professionText = alumni.profession ? alumni.profession : 'Profession N/A';
+                const batchText = alumni.batch ? `Batch: ${alumni.batch}` : '';
+                const companyText = alumni.companyName ? `Company: ${alumni.companyName}` : '';
+
+                card.innerHTML = `
+                    <img src="https://ui-avatars.com/api/?name=${alumni.fullName}&background=2563eb&color=fff&bold=true" alt="${alumni.fullName}" class="w-12 h-12 rounded-full object-cover">
+                    <div style="flex:1;">
+                        <p class="font-semibold text-lg text-gray-900">${alumni.fullName}</p>
+                        <p class="text-sm text-gray-600">
+                            ${professionText} ${companyText ? '| ' + companyText : ''} | ${majorText} | ${gradYearText} ${batchText ? '| ' + batchText : ''}
+                        </p>
+                    </div>
+                    <div style="margin-left:12px; display:flex; gap:8px; align-items:center">
+                        <button class="view-btn bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" data-id="${alumni._id}">View Profile</button>
+                        <button class="message-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" data-id="${alumni._id}" data-name="${alumni.fullName}">Message</button>
+                        <button class="connect-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" data-id="${alumni._id}">Connect</button>
+                    </div>
+                `;
+
+                // Clicking card (outside button) navigates to profile
+                card.addEventListener('click', (e) => {
+                    if (e.target && e.target.classList.contains('connect-btn')) return; // prevent when clicking connect
+                    window.location.href = `user-profile.html?userId=${alumni._id}`;
+                });
+
+                // Connect button handler
+                setTimeout(()=>{
+                    const btn = card.querySelector('.connect-btn');
+                    if (btn) btn.addEventListener('click', async (ev) => {
+                        ev.stopPropagation();
+                        const token = localStorage.getItem('token');
+                        try {
+                            btn.disabled = true; btn.textContent = 'Requesting...';
+                            const res = await fetch(`${BACKEND_URL}/api/connections/request`, { method: 'POST', headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ alumniId: btn.getAttribute('data-id') }) });
+                            if (res.ok) { btn.textContent = 'Requested'; btn.classList.remove('bg-green-500'); btn.classList.add('bg-gray-500'); }
+                            else { const text = await res.json(); alert(text.message||'Failed'); btn.disabled=false; btn.textContent='Connect'; }
+                        } catch (err) { console.error(err); alert('Error connecting'); btn.disabled=false; btn.textContent='Connect'; }
+                    });
+                    const viewBtn = card.querySelector('.view-btn');
+                    if (viewBtn) viewBtn.addEventListener('click',(ev)=>{
+                        ev.stopPropagation();
+                        const id = viewBtn.getAttribute('data-id');
+                        window.location.href = `user-profile.html?userId=${id}`;
+                    });
+                    const msgBtn = card.querySelector('.message-btn');
+                    if (msgBtn) msgBtn.addEventListener('click', (ev)=>{
+                        ev.stopPropagation();
+                        const id = msgBtn.getAttribute('data-id');
+                        const name = encodeURIComponent(msgBtn.getAttribute('data-name')||'Chat');
+                        window.location.href = `chat.html?userId=${id}&name=${name}`;
+                    });
+                },10);
+
+                return card;
+            };
+
+            // SEARCH FORM SUBMISSION HANDLER
+            searchForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                resultsContainer.innerHTML = '<p class="text-blue-500 font-medium">Searching...</p>';
+                resultsHeader.textContent = 'Searching...';
+
+                const keyword = document.getElementById('keyword').value;
+                const major = document.getElementById('major').value;
+                const graduationYear = document.getElementById('graduationYear').value;
+                const location = document.getElementById('location').value;
+
+                const queryParams = new URLSearchParams();
+                if (keyword) queryParams.append('keyword', keyword);
+                if (major) queryParams.append('major', major);
+                if (graduationYear) queryParams.append('graduationYear', graduationYear);
+                // if (location) queryParams.append('location', location);
+
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/alumni/search?${queryParams.toString()}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    resultsContainer.innerHTML = '';
+
+                    if (response.ok) {
+                        const alumni = await response.json();
+
+                        resultsHeader.textContent = `Search Results (${alumni.length} found)`;
+
+                        if (alumni.length > 0) {
+                            alumni.forEach(alum => {
+                                resultsContainer.appendChild(createResultCard(alum));
+                            });
+                        } else {
+                            resultsContainer.innerHTML = '<p class="text-gray-500 p-4 border border-dashed rounded-lg text-center">No alumni found matching your criteria. Try different keywords.</p>';
+                        }
+                    } else if (response.status === 401) {
+                        alert('Your session has expired. Please log in again.');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userType');
+                        window.location.href = './studentlogin.html';
+                    } else {
+                        const errorText = await response.text();
+                        resultsContainer.innerHTML = `<p class="text-red-500">Error during search: ${errorText}</p>`;
+                    }
+                } catch (error) {
+                    console.error('Error during search:', error);
+                    resultsContainer.innerHTML = '<p class="text-red-500">An error occurred while connecting to the server.</p>';
+                }
+            });
+
+            // LOGOUT BUTTON FUNCTIONALITY
+            document.getElementById('logoutButton').addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userType');
+                window.location.href = userType === 'alumni' ? './alumnilogin.html' : './studentlogin.html';
+            });
+        });
+    </script>
+</body>
+</html>

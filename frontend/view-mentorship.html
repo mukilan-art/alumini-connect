@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Mentorship Request</title>
+    <style>
+        :root { --primary:#2c3e50; --accent:#3498db; --bg:#f4f7f6; --white:#fff; }
+        *{box-sizing:border-box;font-family:Segoe UI, sans-serif}
+        body{background:var(--bg);min-height:100vh;padding:40px}
+        .card{max-width:800px;margin:40px auto;background:var(--white);padding:30px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+        h1{color:var(--primary)}
+        .meta{color:#6b7280;margin-bottom:12px}
+        .topic{color:var(--accent);font-weight:700}
+        .controls{margin-top:20px;display:flex;gap:12px}
+        .btn{padding:10px 18px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+        .btn-accept{background:#10b981;color:white}
+        .btn-decline{background:#ef4444;color:white}
+        .btn-back{background:#64748b;color:white}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <a href="manage-mentorship.html" class="btn btn-back" style="text-decoration:none;display:inline-block;margin-bottom:12px">← Back to list</a>
+        <h1>Mentorship Request</h1>
+        <div id="content">
+            <p class="meta">Loading request...</p>
+        </div>
+        <div class="controls" id="controls" style="display:none">
+            <button class="btn btn-accept" id="acceptBtn">Accept</button>
+            <button class="btn btn-decline" id="declineBtn">Decline</button>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+        function getQueryParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        async function loadRequest() {
+            const id = getQueryParam('id');
+            const content = document.getElementById('content');
+            const controls = document.getElementById('controls');
+            if (!id) { content.innerHTML = '<p class="meta">No request id provided.</p>'; return; }
+
+            try {
+                const res = await fetch(`${API_URL}/api/mentorship/${id}`);
+                if (!res.ok) { content.innerHTML = `<p class="meta">Failed to load request (${res.status}).</p>`; return; }
+                const req = await res.json();
+
+                const created = new Date(req.createdAt).toLocaleString();
+                content.innerHTML = `
+                    <p class="meta">Requested on: ${created}</p>
+                    <h2>${req.studentName}</h2>
+                    <p class="topic">Topic: ${req.subject}</p>
+                    <p style="margin-top:12px">${req.message}</p>
+                    <p style="margin-top:16px"><strong>Status:</strong> <span id="status">${req.status}</span></p>
+                `;
+
+                controls.style.display = 'flex';
+                document.getElementById('acceptBtn').onclick = () => updateStatus(id, 'Accepted');
+                document.getElementById('declineBtn').onclick = () => updateStatus(id, 'Declined');
+            } catch (err) {
+                content.innerHTML = '<p class="meta">Error loading request.</p>';
+            }
+        }
+
+        async function updateStatus(id, newStatus) {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${API_URL}/api/mentorship/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!res.ok) { alert('Failed to update status.'); return; }
+                const updated = await res.json();
+                document.getElementById('status').textContent = updated.status;
+                alert(`Request ${updated.status}`);
+            } catch (err) {
+                alert('Error updating status.');
+            }
+        }
+
+        window.onload = loadRequest;
+    </script>
+</body>
+</html>

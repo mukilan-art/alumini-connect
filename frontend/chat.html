@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Messages</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+  <style>
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;background:#f3f4f6;margin:0}
+    .chat-page{max-width:980px;margin:32px auto;background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.08);overflow:hidden;display:flex}
+    .sidebar{width:320px;background:#111827;color:#fff;padding:18px}
+    .sidebar h3{margin:0 0 12px;font-size:1.05rem}
+    .contacts{max-height:64vh;overflow:auto}
+    .contact-item{display:flex;align-items:center;gap:12px;padding:8px;border-radius:8px;cursor:pointer}
+    .contact-item:hover{background:rgba(255,255,255,0.03)}
+    .conv-area{flex:1;display:flex;flex-direction:column;min-height:520px}
+    .conv-header{padding:16px;border-bottom:1px solid #eef2f7;background:#fff;display:flex;align-items:center;justify-content:space-between}
+    .conv-messages{flex:1;padding:18px;overflow:auto;background:#f8fafc;display:flex;flex-direction:column}
+    .conv-input{padding:12px;border-top:1px solid #eef2f7;display:flex;gap:8px}
+    .conv-input input{flex:1;padding:10px;border-radius:8px;border:1px solid #e6eef6}
+    .btn{background:#2563eb;color:white;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    .chat-msg{max-width:70%;margin-bottom:8px;padding:8px 10px;border-radius:10px;cursor:pointer}
+    .chat-msg-sent{margin-left:auto;background:#e0f2fe;text-align:right}
+    .chat-msg-recv{margin-right:auto;background:#fff;text-align:left}
+    .chat-meta{font-size:0.8rem;color:#64748b;margin-top:6px}
+    .chat-sender-name{font-size:0.75rem;color:#0ea5e9;font-weight:600;margin-bottom:4px}
+    .notification-popup{position:fixed;top:20px;right:20px;background:#10b981;color:white;padding:12px 16px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000;animation:slideIn 0.3s ease-out}
+    @keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
+    .contact-item.active{background:#2563eb;border-left:3px solid #2563eb;color:#fff}
+    .contact-item.active:hover{background:#1d4ed8}
+  </style>
+</head>
+<body>
+  <div class="chat-page">
+    <aside class="sidebar">
+      <h3>Messages</h3>
+      <div style="margin-bottom:8px;color:#94a3b8;font-size:0.9rem">Select a user to message</div>
+      <div class="contacts" id="contactsList">
+        <!-- optionally populate recent contacts -->
+      </div>
+    </aside>
+
+    <section class="conv-area">
+      <div class="conv-header">
+        <div>
+          <div id="chat-title" style="font-weight:700">Select a conversation</div>
+          <div id="chat-subtitle" style="font-size:0.9rem;color:#6b7280"></div>
+        </div>
+        <div>
+          <button id="backToSearch" class="btn" style="background:#111827">Back</button>
+        </div>
+      </div>
+
+      <div id="chat-messages" class="conv-messages"></div>
+
+      <div class="conv-input">
+        <input id="chat-input" placeholder="Write a message..." />
+        <button id="chat-send" class="btn">Send</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="assets/js/chat.js"></script>
+  <script>
+    function getQuery() { const p=new URLSearchParams(location.search); return { userId: p.get('userId'), name: p.get('name') } }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // make sure user is authenticated before proceeding
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      const userType = localStorage.getItem('userType');
+
+      if (!token || !userId) {
+        alert('You must be logged in to use chat');
+        window.location.href = userType === 'alumni' ? 'alumnilogin.html' : 'studentlogin.html';
+        return;
+      }
+
+      // load contacts (connections) and render in sidebar
+      async function loadContactsList(){
+        try{
+          const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : location.origin;
+          const res = await fetch(`${API_URL}/api/users/${userId}/connections`, { headers: { 'Authorization': 'Bearer '+token } });
+          const listEl = document.getElementById('contactsList');
+          if (!listEl) return;
+          listEl.innerHTML = '';
+          if (!res.ok){ listEl.innerHTML = '<div style="color:#94a3b8">Unable to load connections.</div>'; return; }
+          const conns = await res.json();
+          if (!conns || conns.length === 0){ listEl.innerHTML = '<div style="color:#94a3b8">No connections yet.</div>'; return; }
+
+          conns.forEach(c => {
+            const item = document.createElement('div');
+            item.className = 'contact-item';
+            item.setAttribute('data-user-id', c._id);
+            const left = document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='10px';
+            const avatar = document.createElement('img'); avatar.src = c.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.fullName||'User')}`; avatar.style.width='40px'; avatar.style.height='40px'; avatar.style.borderRadius='50%'; avatar.style.objectFit='cover';
+            const info = document.createElement('div'); info.innerHTML = `<div style="font-weight:700">${c.fullName || c.email || 'Unknown'}</div><div style="font-size:0.85rem;color:#9ca3af">${c.profession || ''}</div>`;
+            left.appendChild(avatar); left.appendChild(info);
+
+            item.appendChild(left);
+            item.addEventListener('click', ()=>{
+              // Remove active class from all contact items
+              document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+              // Add active class to clicked item
+              item.classList.add('active');
+              window.initChatWith(c._id, c.fullName || c.email || 'Chat');
+              item.classList.remove('unread');
+            });
+
+            listEl.appendChild(item);
+          });
+        }catch(e){ console.error('Load contacts failed', e); }
+      }
+
+      const q = getQuery();
+      if (q.userId) {
+        // initialize chat with partner from query
+        window.initChatWith(q.userId, decodeURIComponent(q.name || 'Chat'));
+        // Highlight the active contact after contacts are loaded
+        setTimeout(() => {
+          const activeContact = document.querySelector(`.contact-item[data-user-id="${q.userId}"]`);
+          if (activeContact) {
+            document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+            activeContact.classList.add('active');
+          }
+        }, 1000); // Small delay to ensure contacts are loaded
+      }
+
+      document.getElementById('backToSearch').addEventListener('click', ()=>{
+        const userType = localStorage.getItem('userType');
+        window.location.href = userType === 'alumni' ? 'alumni-dashboard.html' : 'student-dashboard.html';
+      });
+
+      // populate contacts list on load
+      loadContactsList();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Career Opportunity | Alumni Connect</title>
+    <style>
+        :root {
+            --primary-dark: #2c3e50;
+            --accent-blue: #3498db;
+            --bg-gray: #f4f7f6;
+            --white: #ffffff;
+            --border-color: #dcdde1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+        body { display: flex; background: var(--bg-gray); min-height: 100vh; }
+
+        /* Sidebar - Same as Dashboard for Consistency */
+        .sidebar {
+            width: 260px;
+            background: var(--primary-dark);
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .sidebar h2 { margin-bottom: 30px; text-align: center; color: var(--accent-blue); }
+
+        .nav-links { list-style: none; }
+        .nav-links li { margin-bottom: 15px; }
+        .nav-links a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: block;
+            padding: 12px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .nav-links a:hover { background: var(--accent-blue); }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .form-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 700px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .form-header { margin-bottom: 30px; }
+        .form-header h1 { font-size: 1.8rem; color: var(--primary-dark); }
+        .form-header p { color: #7f8c8d; margin-top: 5px; }
+
+        /* Form Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+            font-size: 0.9rem;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        textarea { height: 120px; resize: none; }
+
+        .btn-submit {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover { background: #2980b9; transform: translateY(-2px); }
+
+        .status-msg {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Connect+</h2>
+        <ul class="nav-links">
+            <li><a href="alumni-dashboard.html">🏠 Dashboard</a></li>
+            <li><a href="news.html">📰 Latest News</a></li>
+            <li><a href="requests.html">🔔 Requests</a></li>
+            <li><a href="post-information.html" style="background: var(--accent-blue);">✍️ Share Information</a></li>
+            <li><a href="profile-settings.html">⚙️ Profile Settings</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="form-card">
+            <div class="form-header">
+                <h1>Post a Job</h1>
+                <p>Fill in the details to share a career opportunity with students.</p>
+            </div>
+
+            <form id="jobPostingForm">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="title">Job Title</label>
+                        <input type="text" id="title" placeholder="e.g. Senior Frontend Developer" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company">Company</label>
+                        <input type="text" id="company" placeholder="e.g. Microsoft" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" placeholder="e.g. Remote / New York" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Job Type</label>
+                        <select id="type">
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Contract">Contract</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="applyLink">Application Link/Email</label>
+                        <input type="text" id="applyLink" placeholder="https://careers.co/job" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description">Job Description</label>
+                        <textarea id="description" placeholder="Briefly describe the role, requirements, and benefits..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Publish Opportunity</button>
+                <div id="status" class="status-msg"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        document.getElementById('jobPostingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const status = document.getElementById('status');
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+
+            const jobData = {
+                title: document.getElementById('title').value,
+                company: document.getElementById('company').value,
+                location: document.getElementById('location').value,
+                type: document.getElementById('type').value,
+                description: document.getElementById('description').value,
+                applyLink: document.getElementById('applyLink').value,
+                userId: localStorage.getItem('userId') // Sends the logged-in user's ID
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/jobs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jobData)
+                });
+
+                if (response.ok) {
+                    status.style.display = "block";
+                    status.style.backgroundColor = "#d4edda";
+                    status.style.color = "#155724";
+                    status.innerText = "Job posted successfully!";
+                    setTimeout(() => window.location.href = 'alumni-dashboard.html', 2000);
+                } else {
+                    throw new Error("Failed to post");
+                }
+            } catch (error) {
+                status.style.display = "block";
+                status.style.backgroundColor = "#f8d7da";
+                status.style.color = "#721c24";
+                status.innerText = "Error: Could not connect to the server.";
+            }
+        });
+    </script>
+</body>
+</html>

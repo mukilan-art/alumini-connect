@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Events | Student Hub</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent-green: #2ecc71;
+            --bg: #f0f2f5;
+            --white: #ffffff;
+            --text-dark: #333;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { display: flex; background: var(--bg); min-height: 100vh; }
+
+        /* Sidebar - Consistent styling */
+        .sidebar {
+            width: 260px;
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .sidebar h2 { color: var(--accent-green); margin-bottom: 30px; text-align: center; }
+
+        .nav-links { list-style: none; }
+        .nav-links li { margin-bottom: 12px; }
+        .nav-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            display: block;
+            padding: 12px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255,255,255,0.1);
+            color: var(--accent-green);
+        }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; flex-grow: 1; padding: 40px; }
+
+        .header { margin-bottom: 40px; }
+        .header h1 { font-size: 2.2rem; color: var(--primary); }
+
+        /* Event Cards Layout */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .event-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .event-card:hover { transform: translateY(-5px); }
+
+        .event-banner {
+            height: 140px;
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .event-body { padding: 20px; flex-grow: 1; }
+
+        .event-date {
+            color: var(--accent-green);
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .event-title { font-size: 1.25rem; color: var(--primary); margin-bottom: 10px; }
+
+        .event-desc { color: #666; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; }
+
+        .event-footer {
+            padding: 15px 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-register {
+            background: var(--primary);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-register:hover { background: var(--accent-green); }
+
+        .location-info { font-size: 0.85rem; color: #7f8c8d; }
+
+        #noEvents { text-align: center; padding: 50px; color: #7f8c8d; grid-column: 1/-1; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Student Hub</h2>
+        <ul class="nav-links">
+            <li><a href="student-dashboard.html">🏠 Dashboard</a></li>
+            <li><a href="latest-news.html">📰 Latest News</a></li>
+            <li><a href="#" class="active">📅 Events</a></li>
+            <li><a href="view-jobs.html">💼 Career Board</a></li>
+            <li><a href="profile-settings.html">⚙️ My Profile</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Upcoming Events</h1>
+            <p>Don't miss out on workshops and networking sessions.</p>
+        </div>
+
+        <div class="events-grid" id="eventList">
+            <div id="noEvents">Loading upcoming events...</div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        async function fetchEvents() {
+            const container = document.getElementById('eventList');
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+
+            try {
+                // Assuming you'll create an /api/events route
+                const response = await fetch(`${API_URL}/api/events`);
+                const events = await response.json();
+
+                if (!response.ok) throw new Error();
+
+                container.innerHTML = '';
+
+                if (events.length === 0) {
+                    container.innerHTML = "<div id='noEvents'>No events scheduled right now. Check back later!</div>";
+                    return;
+                }
+
+                events.forEach(event => {
+                    const eventDate = new Date(event.date).toLocaleString('en-US', {
+                        weekday: 'short', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    container.innerHTML += `
+                        <div class="event-card">
+                            <div class="event-banner">${event.category || 'Workshop'}</div>
+                            <div class="event-body">
+                                <span class="event-date">📅 ${eventDate}</span>
+                                <h2 class="event-title">${event.title}</h2>
+                                <p class="event-desc">${event.description}</p>
+                            </div>
+                            <div class="event-footer">
+                                <span class="location-info">📍 ${event.location}</span>
+                                <a href="${event.link}" target="_blank" class="btn-register">Register</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                container.innerHTML = "<div id='noEvents'>Unable to load events at this time.</div>";
+            }
+        }
+
+        window.onload = fetchEvents;
+    </script>
+</body>
+</html>

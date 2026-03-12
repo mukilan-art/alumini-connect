@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        #dashboard-layout {
+            min-height: 100vh;
+        }
+        .sidebar-link {
+            transition: all 0.2s;
+        }
+        .sidebar-link:hover {
+            background-color: #1e3a8a; /* Darker blue on hover */
+            transform: translateX(5px);
+        }
+        .input-group label {
+            font-weight: 600;
+            color: #4b5563; /* Gray-700 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="dashboard-layout" class="flex">
+        <aside class="w-64 bg-blue-900 text-white flex flex-col fixed h-full shadow-lg">
+            <div class="p-6 border-b border-blue-700">
+                <h2 class="text-2xl font-extrabold tracking-wider">Alumni Connect</h2>
+            </div>
+
+            <nav class="flex-grow p-4 space-y-2">
+                <a href="student-dashboard.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🏠 Dashboard
+                </a>
+                <a href="search-page.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    🔍 Search Alumni
+                </a>
+                <a href="#" class="sidebar-link block py-3 px-4 rounded-lg bg-blue-700 font-semibold">
+                    👤 Edit Profile
+                </a>
+                <a href="#" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    📰 Latest News
+                </a>
+                <a href="#" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    📅 Events
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-blue-700">
+                <button id="logoutButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-lg transition-colors duration-300">
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-64 p-8">
+            <div class="bg-white p-10 rounded-xl shadow-lg">
+                <h1 class="text-3xl font-bold text-gray-800 border-b pb-4 mb-6">Edit Your Profile</h1>
+
+                <form id="editProfileForm" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 flex flex-col items-center space-y-6 pt-4">
+                        <div class="relative group cursor-pointer">
+                            <div class="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 border-blue-200 shadow-md">
+                                <img id="profile-picture" src="https://ui-avatars.com/api/?name=User" alt="Profile" class="w-full h-full object-cover" />
+                            </div>
+                            <div class="absolute inset-0 rounded-full bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <span class="text-white text-sm font-semibold text-center px-2">Change Photo</span>
+                            </div>
+                            <input 
+                                type="file" 
+                                id="profilePictureInput" 
+                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml"
+                                class="hidden"
+                            />
+                        </div>
+                        <button type="button" id="changePhotoBtn" class="text-blue-600 hover:text-blue-800 font-medium">
+                            Change Photo
+                        </button>
+
+                        <div class="w-full space-y-2 pt-4 input-group">
+                            <label for="bio" class="block text-sm">Bio / About Me</label>
+                            <textarea id="bio" name="bio" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-700"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div class="input-group">
+                            <label for="fullName" class="block text-sm">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" required class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="email" class="block text-sm">Email (Read Only)</label>
+                            <input type="email" id="email" name="email" disabled class="w-full p-3 border border-gray-300 bg-gray-100 rounded-lg mt-1 text-gray-500 cursor-not-allowed">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="newPassword" class="block text-sm">New Password</label>
+                            <input type="password" id="newPassword" name="newPassword" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="confirmPassword" class="block text-sm">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="major" class="block text-sm">Major / Department</label>
+                            <input type="text" id="major" name="major" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="graduationYear" class="block text-sm">Expected/Actual Graduation Year</label>
+                            <input type="number" id="graduationYear" name="graduationYear" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="batch" class="block text-sm">Batch</label>
+                            <input type="text" id="batch" name="batch" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group student-only" id="workingFieldGroup">
+                            <label for="workingField" class="block text-sm">Working Field</label>
+                            <input type="text" id="workingField" name="workingField" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group student-only" id="companyNameGroup">
+                            <label for="companyName" class="block text-sm">Company Name</label>
+                            <input type="text" id="companyName" name="companyName" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="md:col-span-2 pt-4 flex justify-end">
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 shadow-md">
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        let USER_ID = null;
+        const userType = localStorage.getItem('userType');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const form = document.getElementById('editProfileForm');
+            const profilePicture = document.getElementById('profile-picture');
+            const changePhotoBtn = document.getElementById('changePhotoBtn');
+            const profilePictureInput = document.getElementById('profilePictureInput');
+            const profilePictureParent = document.querySelector('.relative.group');
+
+            // Click handler for profile picture and button
+            if (profilePictureParent) {
+                profilePictureParent.addEventListener('click', (e) => {
+                    if (profilePictureInput) {
+                        profilePictureInput.click();
+                    }
+                });
+            }
+
+            if (changePhotoBtn) {
+                changePhotoBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (profilePictureInput) {
+                        profilePictureInput.click();
+                    }
+                });
+            }
+
+            // File input change handler
+            if (profilePictureInput) {
+                profilePictureInput.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        try {
+                            // Create canvas to compress image
+                            const img = new Image();
+                            img.onload = async () => {
+                                const canvas = document.createElement('canvas');
+                                let width = img.width;
+                                let height = img.height;
+                                
+                                // Reduce size if image is too large
+                                const maxWidth = 400;
+                                const maxHeight = 400;
+                                if (width > maxWidth || height > maxHeight) {
+                                    const scale = Math.min(maxWidth / width, maxHeight / height);
+                                    width *= scale;
+                                    height *= scale;
+                                }
+                                
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, width, height);
+                                
+                                // Compress to JPEG with quality 0.7
+                                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                                
+                                try {
+                                    const base64Url = token.split('.')[1];
+                                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                                    const payload = JSON.parse(window.atob(base64));
+                                    const userId = payload.userId;
+
+                                    const updateRes = await fetch(`${BACKEND_URL}/api/users/${userId}`, {
+                                        method: 'PUT',
+                                        headers: { 
+                                            'Content-Type': 'application/json',
+                                            'Authorization': `Bearer ${token}`
+                                        },
+                                        body: JSON.stringify({ profileImage: compressedBase64 })
+                                    });
+
+                                    if (!updateRes.ok) {
+                                        const errorData = await updateRes.json();
+                                        throw new Error(errorData.message || 'Failed to update profile picture');
+                                    }
+                                    
+                                    // Update the image on the page
+                                    profilePicture.src = compressedBase64;
+                                    // Persist to localStorage under a user-scoped key so other open pages reflect the correct user's image immediately
+                                    try {
+                                        const base64Url = token.split('.')[1];
+                                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                                        const payload = JSON.parse(window.atob(base64));
+                                        const uid = payload.userId;
+                                        localStorage.setItem(`profileImage_${uid}`, compressedBase64);
+                                        // remove legacy generic key if present
+                                        localStorage.removeItem('profileImage');
+                                    } catch(e) { console.warn('Could not save profileImage to localStorage', e); }
+                                    alert('Profile picture updated successfully!');
+                                } catch (err) {
+                                    console.error('Error updating profile picture:', err);
+                                    alert('Failed to update profile picture: ' + err.message);
+                                }
+                            };
+                            img.src = event.target.result;
+                        } catch (err) {
+                            console.error('Error processing image:', err);
+                            alert('Error processing image. Please try a different file.');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // hide alumni-only fields when student
+            if (userType === 'student') {
+                const wGroup = document.getElementById('workingFieldGroup');
+                const cGroup = document.getElementById('companyNameGroup');
+                if (wGroup) wGroup.style.display = 'none';
+                if (cGroup) cGroup.style.display = 'none';
+            }
+            // 🛑 REDIRECT CHECK 🛑
+            if (!token || !userType) {
+                window.location.href = userType === 'alumni' ? './alumnilogin.html' : './studentlogin.html';
+                return;
+            }
+
+            // 1. FETCH AND DISPLAY EXISTING DATA
+            const loadUserData = async () => {
+                try {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const payload = JSON.parse(window.atob(base64));
+                    USER_ID = payload.userId;
+
+                    const response = await fetch(`${BACKEND_URL}/api/users/${USER_ID}`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (response.ok) {
+                        const user = await response.json();
+
+                        // Populate form fields
+                        document.getElementById('fullName').value = user.fullName || '';
+                        document.getElementById('email').value = user.email || '';
+                        document.getElementById('major').value = user.major || '';
+                        document.getElementById('graduationYear').value = user.graduationYear || '';
+                        document.getElementById('batch').value = user.batch || '';
+                        document.getElementById('bio').value = user.bio || '';
+                        if (userType !== 'student') {
+                            document.getElementById('workingField').value = user.workingField || '';
+                            document.getElementById('companyName').value = user.companyName || '';
+                        }
+
+                        // Update Profile Picture - Display actual profile picture or generated avatar
+                        if (user.profileImage) {
+                            profilePicture.src = user.profileImage;
+                        } else if (user.fullName) {
+                            profilePicture.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=2563eb&color=fff&bold=true`;
+                        }
+                    } else if (response.status === 401) {
+                        // Force logout if token is invalid
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userType');
+                        window.location.href = './studentlogin.html';
+                    } else {
+                        alert('Failed to load user profile data.');
+                    }
+                } catch (error) {
+                    console.error('Error loading user data:', error);
+                    alert('An error occurred while loading your profile.');
+                }
+            };
+
+            // 2. FORM SUBMISSION HANDLER
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (newPassword && newPassword !== confirmPassword) {
+                    alert('New Password and Confirm Password do not match.');
+                    return;
+                }
+
+                const updateData = {
+                    fullName: document.getElementById('fullName').value,
+                    major: document.getElementById('major').value,
+                    graduationYear: document.getElementById('graduationYear').value,                    batch: document.getElementById('batch').value,
+                    workingField: document.getElementById('workingField').value,
+                    companyName: document.getElementById('companyName').value,                    bio: document.getElementById('bio').value,
+                };
+
+                // Only include password if a new one was entered
+                if (newPassword) {
+                    updateData.password = newPassword;
+                }
+
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/users/${USER_ID}`, {
+                        method: 'PUT', // Use PUT or PATCH for updates
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+
+                    if (response.ok) {
+                        alert('Profile updated successfully!');
+                        // Clear password fields after successful update
+                        document.getElementById('newPassword').value = '';
+                        document.getElementById('confirmPassword').value = '';
+                        loadUserData(); // Reload data just in case
+                        // Redirect to profile page so user can immediately see the updated details
+                        window.location.href = `user-profile.html?userId=${USER_ID}`;
+                    } else {
+                        const errorText = await response.text();
+                        alert(`Profile update failed: ${errorText}`);
+                    }
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    alert('An error occurred during profile update.');
+                }
+            });
+
+            // 3. LOGOUT BUTTON
+            document.getElementById('logoutButton').addEventListener('click', () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userType');
+                window.location.href = userType === 'alumni' ? './alumnilogin.html' : './studentlogin.html';
+            });
+
+            // Start loading data
+            loadUserData();
+        });
+    </script>
+</body>
+</html>

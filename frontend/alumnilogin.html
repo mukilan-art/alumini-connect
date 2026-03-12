@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alumni Login</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      /* Fallback gradient, then background image */
+      background: linear-gradient(135deg, #1e3a8a 0%, #1a2f5a 100%);
+      background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231e3a8a;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%231a2f5a;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='1200' height='800'/%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+      color: #333;
+      padding: 20px;
+    }
+
+    .container {
+      padding: 40px;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+    
+    .welcome-text {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: #6b7280;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .heading {
+      font-size: 2rem;
+      margin-bottom: 24px;
+      font-weight: 700;
+      color: #1e3a8a;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .input-field {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-field input {
+      padding: 12px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      background-color: #f9fafb;
+      color: #1f2937;
+    }
+
+    .input-field input:focus {
+      border-color: #2563eb;
+      outline: none;
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .input-field label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .checkbox-field input[type="checkbox"] {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #2563eb;
+      color: white;
+      transition: all 0.3s ease;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background-color: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .acc-text {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .acc-text span {
+      color: #2563eb;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .acc-text span:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      font-size: 0.85rem;
+      margin-top: 4px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="welcome-text">Welcome Back</p>
+    <h2 class="heading">Alumni Login</h2>
+    <form class="form" id="alumniLoginForm" novalidate>
+      <div class="input-field">
+        <label for="email">Email Address</label>
+        <input required type="email" name="email" id="email" placeholder="you@example.com" />
+        <div class="error-msg" id="emailError"></div>
+      </div>
+      <div class="input-field">
+        <label for="password">Password</label>
+        <input required type="password" name="password" id="password" placeholder="••••••••" />
+        <div class="error-msg" id="passwordError"></div>
+      </div>
+      <div class="checkbox-field">
+        <input type="checkbox" id="showPassword" />
+        <label for="showPassword" style="margin: 0;">Show password</label>
+      </div>
+      <button class="btn" type="submit">Log In</button>
+      <div class="error-msg" id="formError"></div>
+    </form>
+    <div class="acc-text">
+      New here?
+      <span onclick="window.location.href='alumniregister.html'">Create Account</span>
+    </div>
+  </div>
+
+<script src="config.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : 'http://localhost:5000';
+    const loginForm = document.getElementById('alumniLoginForm');
+    const showPasswordCheckbox = document.getElementById('showPassword');
+    const passwordInput = document.getElementById('password');
+    const formErrorEl = document.getElementById('formError');
+
+    // Show/hide password toggle
+    if (showPasswordCheckbox && passwordInput) {
+      showPasswordCheckbox.addEventListener('change', (e) => {
+        passwordInput.type = e.target.checked ? 'text' : 'password';
+      });
+    }
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        formErrorEl.style.display = 'none';
+        formErrorEl.textContent = '';
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+          formErrorEl.textContent = 'Please fill in all fields';
+          formErrorEl.style.display = 'block';
+          return;
+        }
+
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Logging in...';
+
+        try {
+          const response = await fetch(`${API_URL}/api/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, userType: 'alumni' })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            localStorage.clear(); // Clear all previous data
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('userType', 'alumni');
+            
+            window.location.href = 'alumni-dashboard.html';
+          } else {
+            formErrorEl.textContent = data.message || 'Login failed. Please try again.';
+            formErrorEl.style.display = 'block';
+          }
+        } catch (error) {
+          formErrorEl.textContent = 'Network error. Please check your connection.';
+          formErrorEl.style.display = 'block';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Log In';
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
