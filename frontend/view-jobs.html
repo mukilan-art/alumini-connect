@@ -3,160 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Board | Connect+</title>
+    <title>Career Board | Connect+</title>
     <style>
-        /* COMBINED CSS - PROFESSIONAL THEME */
         :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --bg: #f4f7f6;
-            --white: #ffffff;
-            --text-muted: #7f8c8d;
+            --bg: #f3f6fb;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --muted: #64748b;
+            --primary: #2563eb;
+            --primary-soft: #e0efff;
+            --accent: #0ea5e9;
+            --border: #dbeafe;
+            --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); }
 
-        body { background-color: var(--bg); color: var(--primary); }
+        .page-shell { max-width: 1180px; margin: 0 auto; padding: 24px; }
 
-        /* Header & Search */
-        .header {
-            background: var(--primary);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
+        .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 24px; }
+        .page-title { max-width: 680px; }
+        .page-title h1 { margin: 0; font-size: clamp(2rem, 2.4vw, 2.6rem); line-height: 1.05; }
+        .page-title p { margin: 12px 0 0; color: var(--muted); font-size: 1rem; line-height: 1.75; }
+
+        .status-panel { min-width: 280px; border-radius: 24px; background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%); padding: 24px; box-shadow: var(--shadow); border: 1px solid rgba(37, 99, 235, 0.12); }
+        .status-panel strong { display: block; font-size: 0.9rem; color: var(--muted); margin-bottom: 10px; }
+        .status-panel .status-value { font-size: 2.4rem; color: var(--primary); font-weight: 700; }
+        .status-panel .status-note { margin-top: 12px; color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+
+        .search-panel { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 24px; }
+        .search-panel input { flex: 1 1 420px; border-radius: 18px; border: 1px solid var(--border); padding: 16px 20px; font-size: 1rem; outline: none; }
+        .search-panel .tag { display: inline-flex; gap: 8px; align-items: center; padding: 12px 18px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-size: 0.95rem; }
+
+        .job-grid { display: grid; gap: 20px; }
+        .job-card { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 22px; align-items: center; background: var(--surface); padding: 26px; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow); transition: transform .25s ease, border-color .25s ease; }
+        .job-card:hover { transform: translateY(-2px); border-color: rgba(37, 99, 235, 0.18); }
+
+        .job-card h2 { margin: 0 0 8px; font-size: 1.25rem; }
+        .job-card .company { color: var(--primary); font-weight: 700; margin-bottom: 8px; }
+        .job-card .meta { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 0.95rem; margin-bottom: 14px; }
+        .job-card .meta span { display: inline-flex; align-items: center; gap: 6px; }
+        .job-card p { margin: 0; color: #475569; line-height: 1.7; }
+
+        .apply-group { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+        .job-card .job-status { padding: 8px 14px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-size: 0.85rem; font-weight: 700; }
+        .btn-apply { display: inline-flex; align-items: center; justify-content: center; min-width: 150px; padding: 14px 22px; border-radius: 16px; background: var(--primary); color: #fff; text-decoration: none; font-weight: 700; box-shadow: 0 16px 30px rgba(37, 99, 235, 0.18); transition: transform .2s ease, background .2s ease; }
+        .btn-apply:hover { transform: translateY(-1px); background: #1d4ed8; }
+        .btn-apply[disabled] { opacity: 0.65; cursor: not-allowed; pointer-events: none; }
+
+        .empty-state { text-align: center; padding: 60px 24px; background: var(--surface); border: 1px dashed #cbd5e1; border-radius: 24px; color: var(--muted); }
+
+        @media (max-width: 840px) {
+            .job-card { grid-template-columns: 1fr; }
+            .apply-group { align-items: stretch; }
         }
-
-        .search-container {
-            max-width: 800px;
-            margin: -30px auto 30px;
-            background: var(--white);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 10px;
-        }
-
-        .search-container input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            outline: none;
-        }
-
-        /* Job List */
-        .job-container {
-            max-width: 900px;
-            margin: 0 auto 50px;
-            padding: 0 20px;
-        }
-
-        .job-card {
-            background: var(--white);
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.2s;
-        }
-
-        .job-card:hover { transform: translateY(-3px); }
-
-        .job-info h2 { font-size: 1.3rem; margin-bottom: 5px; color: var(--primary); }
-        .job-info p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 3px; }
-        
-        .company-name { font-weight: bold; color: var(--accent); }
-        .location-tag { background: #e8f4fd; color: #3498db; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; }
-
-        .btn-apply {
-            background: var(--accent);
-            color: white;
-            text-decoration: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .btn-apply:hover { background: #2980b9; }
-
-        .back-nav { padding: 20px; max-width: 900px; margin: auto; }
-        .back-nav a { text-decoration: none; color: var(--accent); font-weight: bold; }
-
-        #noJobs { text-align: center; padding: 50px; color: var(--text-muted); }
     </style>
 </head>
 <body>
+    <div class="page-shell">
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Career Board</h1>
+                <p>Find roles shared by alumni and quickly search by company, title, or keywords.</p>
+            </div>
+            <div class="status-panel">
+                <strong>Updated live from backend</strong>
+                <div class="status-value" id="jobCount">—</div>
+                <div class="status-note">Search across all available alumni job postings. Refresh the page after posting new roles.</div>
+            </div>
+        </div>
 
-    <div class="back-nav">
-        <a href="student-dashboard.html">← Back to Dashboard</a>
-    </div>
+        <div class="search-panel">
+            <input id="searchInput" type="text" placeholder="Search jobs by title, company, or skill..." oninput="filterJobs()" autocomplete="off">
+            <div class="tag">Career Board • Alumni opportunities</div>
+        </div>
 
-    <div class="header">
-        <h1>Career Opportunities</h1>
-        <p>Explore jobs and internships posted by our Alumni network</p>
-    </div>
-
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search by job title or company..." onkeyup="filterJobs()">
-    </div>
-
-    <div class="job-container" id="jobList">
-        <p id="noJobs">Loading opportunities...</p>
+        <div id="jobList" class="job-grid">
+            <div class="empty-state">Loading opportunities…</div>
+        </div>
     </div>
 
     <script src="config.js"></script>
     <script>
         let allJobs = [];
 
-        async function fetchJobs() {
-            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
-            
-            try {
-                // You'll need to create this GET route in your backend!
-                const response = await fetch(`${API_URL}/api/jobs`);
-                allJobs = await response.json();
+        async function resolveBackendUrl() {
+            const candidates = [
+                'http://localhost:5000',
+                'http://localhost:5001',
+                'http://localhost:5002',
+                'http://localhost:5003',
+                'http://localhost:5004',
+                'http://localhost:5005',
+                'http://localhost:5006',
+                'http://localhost:5007',
+                'http://localhost:5008',
+                'http://localhost:5009',
+                'http://localhost:5010',
+                'http://localhost:5011',
+                'http://localhost:5012',
+                'http://localhost:5013',
+                'http://localhost:5014',
+                'http://localhost:5015',
+                'http://localhost:5016',
+                'http://localhost:5017',
+                'http://localhost:5018',
+                'http://localhost:5019',
+                'http://localhost:5020'
+            ];
 
-                displayJobs(allJobs);
+            if (window.__backendHost) return window.__backendHost;
+
+            for (const host of candidates) {
+                try {
+                    const response = await fetch(`${host}/api/jobs`, { method: 'GET' });
+                    if (response.ok) {
+                        window.__backendHost = host;
+                        return host;
+                    }
+                } catch (_) {
+                    // ignore unreachable host
+                }
+            }
+
+            return candidates[0];
+        }
+
+        async function fetchStudentPosts(userId, token, apiBase) {
+            try {
+                const response = await fetch(`${apiBase}/api/posts/connections/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) return [];
+                const posts = await response.json();
+                if (!Array.isArray(posts)) return [];
+                return posts.map(post => ({
+                    title: post.title,
+                    company: post.authorId?.fullName || 'Alumni',
+                    domain: post.domain || 'General',
+                    category: post.category || 'Career Opportunity',
+                    location: post.location || 'Remote',
+                    description: post.content || '',
+                    applyLink: post.applyLink || '',
+                    eventDate: post.eventDate,
+                    createdAt: post.createdAt,
+                    source: 'alumni-post'
+                }));
             } catch (error) {
-                document.getElementById('jobList').innerHTML = "<p>Error connecting to server. Please ensure backend is running.</p>";
+                console.warn('Unable to fetch student alumni posts:', error);
+                return [];
             }
         }
 
-        function displayJobs(jobs) {
+        async function fetchJobs() {
+            const configuredUrl = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : null;
+            let apiBase = configuredUrl;
+            let lastError = null;
+
+            if (!apiBase) {
+                apiBase = await resolveBackendUrl();
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/api/jobs`);
+                if (!response.ok) throw new Error('Backend not available');
+                const jobs = await response.json();
+                if (!Array.isArray(jobs)) throw new Error('Invalid job data');
+
+                const token = localStorage.getItem('token');
+                const userId = localStorage.getItem('userId');
+                let alumniPosts = [];
+
+                if (token && userId) {
+                    alumniPosts = await fetchStudentPosts(userId, token, apiBase);
+                }
+
+                allJobs = [...jobs, ...alumniPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                renderJobs(allJobs);
+            } catch (error) {
+                document.getElementById('jobList').innerHTML = `<div class="empty-state">Error connecting to server. Please ensure the backend is running and accessible at <strong>${apiBase}</strong>.</div>`;
+                document.getElementById('jobCount').textContent = '0';
+                console.error('Career board fetch error:', lastError || error);
+            }
+        }
+
+        function renderJobs(jobs) {
             const container = document.getElementById('jobList');
-            if (jobs.length === 0) {
-                container.innerHTML = "<p id='noJobs'>No job opportunities found matching your search.</p>";
+            const countEl = document.getElementById('jobCount');
+            countEl.textContent = jobs.length.toString();
+
+            if (!jobs.length) {
+                container.innerHTML = `<div class="empty-state">No job opportunities found. Check back later or ask alumni to share new openings.</div>`;
                 return;
             }
 
-            container.innerHTML = jobs.map(job => `
-                <div class="job-card">
-                    <div class="job-info">
-                        <h2>${job.title}</h2>
-                        <p class="company-name">${job.company}</p>
-                        <p><span class="location-tag">📍 ${job.location}</span></p>
-                        <p style="margin-top: 10px; color: #555;">${job.description.substring(0, 100)}...</p>
-                    </div>
-                    <a href="${job.applyLink.startsWith('http') ? job.applyLink : 'mailto:' + job.applyLink}" target="_blank" class="btn-apply">Apply Now</a>
-                </div>
-            `).join('');
+            container.innerHTML = jobs.map(job => {
+                const title = job.title || 'Untitled role';
+                const company = job.company || 'Alumni Opportunity';
+                const domain = job.domain || 'General';
+                const category = job.category || 'Job Vacancy';
+                const location = job.location || 'Remote';
+                const description = (job.description || job.content || '').trim();
+                const descriptionPreview = description ? `${description.substring(0, 140)}...` : 'No description provided.';
+                const eventDate = job.eventDate ? new Date(job.eventDate).toLocaleString() : '';
+                const applyLink = job.applyLink ? job.applyLink.trim() : '';
+                const href = applyLink ? (applyLink.startsWith('http') ? applyLink : `mailto:${applyLink}`) : '#';
+                const disabled = applyLink ? '' : 'disabled';
+                const sourceLabel = job.source === 'alumni-post' ? 'Alumni Post' : 'Career Board';
+
+                return `
+                    <article class="job-card">
+                        <div>
+                            <div class="company">${company}</div>
+                            <h2>${title}</h2>
+                            <div class="meta">
+                                <span>📍 ${location}</span>
+                                <span>✨ ${category}</span>
+                                <span>🧭 ${domain}</span>
+                                <span>🕒 Posted ${new Date(job.createdAt || Date.now()).toLocaleDateString()}</span>
+                                <span>${sourceLabel}</span>
+                            </div>
+                            <p>${descriptionPreview}</p>
+                            ${eventDate ? `<p style="margin-top: 14px; font-weight: 600; color: #2563eb;">Event time: ${eventDate}</p>` : ''}
+                        </div>
+                        <div class="apply-group">
+                            <span class="job-status">Open</span>
+                            <a href="${href}" target="_blank" class="btn-apply" ${disabled}>${applyLink ? 'Apply Now' : 'No link'}</a>
+                        </div>
+                    </article>
+                `;
+            }).join('');
         }
 
         function filterJobs() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allJobs.filter(job => 
-                job.title.toLowerCase().includes(searchTerm) || 
-                job.company.toLowerCase().includes(searchTerm)
-            );
-            displayJobs(filtered);
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!query) {
+                renderJobs(allJobs);
+                return;
+            }
+
+            const filtered = allJobs.filter(job => {
+                const title = (job.title || '').toLowerCase();
+                const company = (job.company || '').toLowerCase();
+                const domain = (job.domain || '').toLowerCase();
+                const category = (job.category || '').toLowerCase();
+                const description = ((job.description || job.content) || '').toLowerCase();
+                return title.includes(query)
+                    || company.includes(query)
+                    || domain.includes(query)
+                    || category.includes(query)
+                    || description.includes(query);
+            });
+
+            renderJobs(filtered);
         }
 
-        window.onload = fetchJobs;
+        window.addEventListener('load', fetchJobs);
     </script>
 </body>
 </html>

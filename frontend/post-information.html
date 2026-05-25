@@ -195,13 +195,38 @@
 
                     <div class="form-group">
                         <label for="category">Category</label>
-                        <select id="category" required>
+                        <select id="category" onchange="toggleFields()" required>
                             <option value="General Update">General Update</option>
                             <option value="Career Advice">Career Advice</option>
                             <option value="Industry News">Industry News</option>
                             <option value="Mentorship Tips">Mentorship Tips</option>
+                            <option value="Job Vacancy">Job Vacancy</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Workshop / Event">Workshop / Event</option>
+                            <option value="Career Opportunity">Career Opportunity</option>
                             <option value="Event Announcement">Event Announcement</option>
+                            <option value="Other">Other</option>
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="domain">Domain / Industry</label>
+                        <input type="text" id="domain" placeholder="e.g. Data Science, Product Management">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" placeholder="e.g. Remote / Bengaluru">
+                    </div>
+
+                    <div class="form-group" id="applyLinkGroup" style="display:none;">
+                        <label for="applyLink">Application Link / Email</label>
+                        <input type="text" id="applyLink" placeholder="https://apply.link or email@example.com">
+                    </div>
+
+                    <div class="form-group" id="eventDateGroup" style="display:none;">
+                        <label for="eventDate">Event Date & Time</label>
+                        <input type="datetime-local" id="eventDate">
                     </div>
 
                     <div class="form-group">
@@ -238,8 +263,8 @@
                 document.querySelector('.btn-submit').disabled = true;
             }
             
-            // Fetch user's full name
-            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+            // Fetch user's full name using resolved backend URL
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : await resolveBackendUrl();
             try {
                 const res = await fetch(`${API_URL}/api/users/${userId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -253,11 +278,21 @@
             }
         });
 
+        function toggleFields() {
+            const category = document.getElementById('category').value;
+            const applyLinkGroup = document.getElementById('applyLinkGroup');
+            const eventDateGroup = document.getElementById('eventDateGroup');
+
+            const showApply = ['Job Vacancy', 'Internship', 'Workshop / Event', 'Career Opportunity'].includes(category);
+            applyLinkGroup.style.display = showApply ? 'block' : 'none';
+            eventDateGroup.style.display = category === 'Workshop / Event' ? 'block' : 'none';
+        }
+
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const status = document.getElementById('status');
-            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : await resolveBackendUrl();
             const token = localStorage.getItem('token');
             const userId = localStorage.getItem('userId');
 
@@ -265,11 +300,14 @@
                 title: document.getElementById('title').value.trim(),
                 content: document.getElementById('content').value.trim(),
                 category: document.getElementById('category').value,
-                author: currentUserName
+                domain: document.getElementById('domain').value.trim(),
+                location: document.getElementById('location').value.trim(),
+                applyLink: document.getElementById('applyLink').value.trim(),
+                eventDate: document.getElementById('eventDate').value || undefined
             };
 
             try {
-                const response = await fetch(`${API_URL}/api/news`, {
+                const response = await fetch(`${API_URL}/api/posts`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -284,13 +322,10 @@
                     status.style.display = 'block';
                     status.classList.remove('error');
                     status.classList.add('success');
-                    status.innerText = '✓ ' + (data.message || 'Post published successfully!');
+                    status.innerHTML = '✓ ' + (data.message || 'Post published successfully!') + ' You can continue editing or return to the dashboard manually.';
                     
                     // Reset form
                     document.getElementById('postForm').reset();
-                    
-                    // Redirect after 2 seconds
-                    setTimeout(() => window.location.href = 'alumni-dashboard.html', 2000);
                 } else {
                     throw new Error(data.message || 'Failed to post');
                 }

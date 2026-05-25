@@ -15,6 +15,7 @@ const connectDB = require('./config/db');
 // This line DESTUCTURES the exports { router, authenticateToken } and assigns the router to authRouter
 const { router: authRouter, authenticateToken } = require('./routes/authRoutes'); // Import auth routes (login/register/search, etc.)
 const { router: newsRouter } = require('./routes/newsRoutes'); // Import News routes
+const { router: jobsRouter } = require('./routes/jobs'); // Import Job routes
 const bcrypt = require('bcryptjs'); // used for password hashing during updates
 const User = require('./models/User'); // Import User model for other routes
 const Connection = require('./models/Connection'); // Import Connection model (added to support connection requests)
@@ -33,45 +34,50 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '25mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '25mb' }));
 
-// create HTTP server and attach socket.io
-const server = http.createServer(app);
-const io = new SocketIOServer(server, {
-    cors: { origin: '*' }
-});
+function createServerWithSocket() {
+    const serverInstance = http.createServer(app);
+    io = new SocketIOServer(serverInstance, {
+        cors: { origin: '*' }
+    });
 
-// Real-time socket handlers
-io.on('connection', (socket) => {
-    console.log('Socket connected:', socket.id, socket.handshake.query);
-    const userId = socket.handshake.query.userId;
-    if (userId) {
-        socket.join(userId);
-    }
-
-    socket.on('joinConversation', (convId) => {
-        if (convId) {
-            socket.join(convId);
-            console.log(`Socket ${socket.id} joined conversation ${convId}`);
+    io.on('connection', (socket) => {
+        console.log('Socket connected:', socket.id, socket.handshake.query);
+        const userId = socket.handshake.query.userId;
+        if (userId) {
+            socket.join(userId);
         }
+
+        socket.on('joinConversation', (convId) => {
+            if (convId) {
+                socket.join(convId);
+                console.log(`Socket ${socket.id} joined conversation ${convId}`);
+            }
+        });
+
+        socket.on('leaveConversation', (convId) => {
+            if (convId) socket.leave(convId);
+        });
+
+        socket.on('sendMessage', async (msg) => {
+            try {
+                const newMsg = new Message(msg);
+                await newMsg.save();
+                io.to(newMsg.conversationId).emit('newMessage', newMsg);
+            } catch (e) {
+                console.error('Socket sendMessage error', e);
+            }
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Socket disconnected', socket.id);
+        });
     });
 
-    socket.on('leaveConversation', (convId) => {
-        if (convId) socket.leave(convId);
-    });
+    return serverInstance;
+}
 
-    socket.on('sendMessage', async (msg) => {
-        try {
-            const newMsg = new Message(msg);
-            await newMsg.save();
-            io.to(newMsg.conversationId).emit('newMessage', newMsg);
-        } catch (e) {
-            console.error('Socket sendMessage error', e);
-        }
-    });
-
-    socket.on('disconnect', () => {
-        console.log('Socket disconnected', socket.id);
-    });
-});
+let io;
+let server;
 
 // Request logging middleware for debugging
 app.use((req, res, next) => {
@@ -90,6 +96,10 @@ console.log('✅ Auth routes mounted');
 // Mount News Routes
 app.use('/api', newsRouter);
 console.log('✅ News routes mounted');
+
+// Mount Job Routes
+app.use('/api', jobsRouter);
+console.log('✅ Job routes mounted');
 
 // Test news endpoint (for debugging)
 app.get('/api/news-test', (req, res) => {
@@ -284,6 +294,7 @@ const mentorshipSchema = new mongoose.Schema({
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     alumniId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     studentName: String,
+    alumniName: String,
     subject: String,
     message: String,
     status: { type: String, enum: ['Pending', 'Accepted', 'Declined'], default: 'Pending' },
@@ -337,8 +348,10 @@ app.post('/api/mentorship/request', authenticateToken, async (req, res) => {
 
         const student = await User.findById(resolvedStudentId).select('fullName');
         const studentName = student ? student.fullName : '';
+        const alumni = await User.findById(resolvedAlumniId).select('fullName');
+        const alumniName = alumni ? alumni.fullName : '';
 
-        const newRequest = new Mentorship({ studentId: resolvedStudentId, alumniId: resolvedAlumniId, studentName, subject, message });
+        const newRequest = new Mentorship({ studentId: resolvedStudentId, alumniId: resolvedAlumniId, studentName, alumniName, subject, message });
         await newRequest.save();
 
         // Notify the alumni (if target is alumni) or student (if target is student)
@@ -348,7 +361,7 @@ app.post('/api/mentorship/request', authenticateToken, async (req, res) => {
                 await notif.save();
             }
             if (requesterType === 'alumni' && resolvedStudentId) {
-                const notif = new Notification({ userId: resolvedStudentId, title: 'New Mentorship Offer', message: `An alumni (${req.user.userId}) offered you mentorship.`, link: '/view-mentorship.html?id='+newRequest._id, entityType: 'mentorship', entityId: newRequest._id });
+                const notif = new Notification({ userId: resolvedStudentId, title: 'New Mentorship Offer', message: `${alumniName} offered you mentorship.`, link: `/view-mentorship.html?id=${newRequest._id}`, entityType: 'mentorship', entityId: newRequest._id });
                 await notif.save();
             }
         } catch (e) { console.error('Notify target failed', e); }
@@ -363,6 +376,12 @@ app.post('/api/mentorship/request', authenticateToken, async (req, res) => {
 // API to get requests for a specific Alumni
 app.get('/api/mentorship/alumni/:id', async (req, res) => {
     const requests = await Mentorship.find({ alumniId: req.params.id });
+    res.json(requests);
+});
+
+// API to get mentorship requests FOR a specific Student (requests they received from alumni)
+app.get('/api/mentorship/student/:id', async (req, res) => {
+    const requests = await Mentorship.find({ studentId: req.params.id });
     res.json(requests);
 });
 
@@ -386,8 +405,12 @@ app.put('/api/mentorship/:id', authenticateToken, async (req, res) => {
         const mentorship = await Mentorship.findById(id);
         if (!mentorship) return res.status(404).json({ message: 'Request not found.' });
 
-        // Only the targeted alumni can update/accept the request
-        if (String(mentorship.alumniId) !== req.user.userId) return res.status(403).json({ message: 'Forbidden.' });
+        // Either the alumni or the student can update the status
+        // Alumni can accept student requests, students can accept alumni offers
+        const isAlumni = String(mentorship.alumniId) === req.user.userId;
+        const isStudent = String(mentorship.studentId) === req.user.userId;
+        
+        if (!isAlumni && !isStudent) return res.status(403).json({ message: 'Forbidden.' });
 
         if (status) {
             mentorship.status = status;
@@ -629,7 +652,8 @@ app.get('/api/connections/count/:userId', async (req, res) => {
 // Create a new post (Alumni only)
 app.post('/api/posts', authenticateToken, async (req, res) => {
     try {
-        const { title, content, category } = req.body;
+        console.log('Create post request body:', JSON.stringify(req.body));
+        const { title, content, category, domain, location, applyLink, eventDate } = req.body;
         const authorId = req.user.userId;
 
         // Verify the user is an alumni
@@ -647,7 +671,11 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
             authorId,
             title: title.trim(),
             content: content.trim(),
-            category: category || 'General Update'
+            category: category || 'General Update',
+            domain: domain ? domain.trim() : undefined,
+            location: location ? location.trim() : undefined,
+            applyLink: applyLink ? applyLink.trim() : undefined,
+            eventDate: eventDate ? new Date(eventDate) : undefined
         });
 
         await newPost.save();
@@ -661,6 +689,7 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
         });
     } catch (err) {
         console.error('Create post error:', err);
+        console.error(err.stack);
         res.status(500).json({ message: 'Server error.' });
     }
 });
@@ -1011,29 +1040,31 @@ app.use((req, res) => {
 const preferredPort = parseInt(process.env.PORT, 10) || 4000;
 let currentPort = preferredPort;
 let listenAttempts = 0;
-const MAX_LISTEN_ATTEMPTS = 10;
+const MAX_LISTEN_ATTEMPTS = 30;
+const LAST_PORT = preferredPort + MAX_LISTEN_ATTEMPTS - 1;
 
 function startListening(port) {
-    server.listen(port, () => console.log(`Server is running on port ${port}`));
-}
+    server = createServerWithSocket();
+    const attemptServer = server;
 
-server.on('error', (err) => {
-    if (err && err.code === 'EADDRINUSE') {
-        listenAttempts += 1;
-        if (listenAttempts > MAX_LISTEN_ATTEMPTS) {
-            console.error(`Could not bind to a free port starting at ${preferredPort} after ${MAX_LISTEN_ATTEMPTS} attempts.`);
-            process.exit(1);
+    attemptServer.once('error', (err) => {
+        if (err && err.code === 'EADDRINUSE') {
+            listenAttempts += 1;
+            if (listenAttempts >= MAX_LISTEN_ATTEMPTS) {
+                console.error(`Could not bind to a free port starting at ${preferredPort} through ${LAST_PORT}. Please stop any other server using these ports or set PORT in .env to a free port.`);
+                process.exit(1);
+            }
+            console.warn(`Port ${currentPort} is in use, trying ${currentPort + 1}...`);
+            currentPort += 1;
+            setTimeout(() => startListening(currentPort), 500);
+            return;
         }
-        console.warn(`Port ${currentPort} is in use, trying ${currentPort + 1}...`);
-        currentPort += 1;
-        // Try the next port after a short delay
-        setTimeout(() => startListening(currentPort), 500);
-        return;
-    }
 
-    // For other errors, log and exit
-    console.error('Server error:', err);
-    process.exit(1);
-});
+        console.error('Server error:', err);
+        process.exit(1);
+    });
+
+    attemptServer.listen(port, () => console.log(`Server is running on port ${port}`));
+}
 
 startListening(currentPort);

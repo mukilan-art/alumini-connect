@@ -96,6 +96,11 @@
                         </div>
 
                         <div class="input-group">
+                            <label for="profession" class="block text-sm">Profession / Title</label>
+                            <input type="text" id="profession" name="profession" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group">
                             <label for="email" class="block text-sm">Email (Read Only)</label>
                             <input type="email" id="email" name="email" disabled class="w-full p-3 border border-gray-300 bg-gray-100 rounded-lg mt-1 text-gray-500 cursor-not-allowed">
                         </div>
@@ -125,12 +130,22 @@
                             <input type="text" id="batch" name="batch" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
                         </div>
 
-                        <div class="input-group student-only" id="workingFieldGroup">
+                        <div class="input-group student-only" id="departmentGroup">
+                            <label for="department" class="block text-sm">Department</label>
+                            <input type="text" id="department" name="department" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group student-only" id="interestsGroup">
+                            <label for="interests" class="block text-sm">Areas of Interest</label>
+                            <input type="text" id="interests" name="interests" placeholder="e.g. AI, Web Development" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+                        </div>
+
+                        <div class="input-group alumni-only" id="workingFieldGroup">
                             <label for="workingField" class="block text-sm">Working Field</label>
                             <input type="text" id="workingField" name="workingField" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
                         </div>
 
-                        <div class="input-group student-only" id="companyNameGroup">
+                        <div class="input-group alumni-only" id="companyNameGroup">
                             <label for="companyName" class="block text-sm">Company Name</label>
                             <input type="text" id="companyName" name="companyName" class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
                         </div>
@@ -258,13 +273,23 @@
                 });
             }
 
-            // hide alumni-only fields when student
+            const wGroup = document.getElementById('workingFieldGroup');
+            const cGroup = document.getElementById('companyNameGroup');
+            const departmentGroup = document.getElementById('departmentGroup');
+            const interestsGroup = document.getElementById('interestsGroup');
+
             if (userType === 'student') {
-                const wGroup = document.getElementById('workingFieldGroup');
-                const cGroup = document.getElementById('companyNameGroup');
                 if (wGroup) wGroup.style.display = 'none';
                 if (cGroup) cGroup.style.display = 'none';
+                if (departmentGroup) departmentGroup.style.display = 'block';
+                if (interestsGroup) interestsGroup.style.display = 'block';
+            } else {
+                if (wGroup) wGroup.style.display = 'block';
+                if (cGroup) cGroup.style.display = 'block';
+                if (departmentGroup) departmentGroup.style.display = 'none';
+                if (interestsGroup) interestsGroup.style.display = 'none';
             }
+
             // 🛑 REDIRECT CHECK 🛑
             if (!token || !userType) {
                 window.location.href = userType === 'alumni' ? './alumnilogin.html' : './studentlogin.html';
@@ -290,11 +315,15 @@
                         // Populate form fields
                         document.getElementById('fullName').value = user.fullName || '';
                         document.getElementById('email').value = user.email || '';
+                        document.getElementById('profession').value = user.profession || '';
                         document.getElementById('major').value = user.major || '';
                         document.getElementById('graduationYear').value = user.graduationYear || '';
                         document.getElementById('batch').value = user.batch || '';
                         document.getElementById('bio').value = user.bio || '';
-                        if (userType !== 'student') {
+                        if (userType === 'student') {
+                            document.getElementById('department').value = user.department || '';
+                            document.getElementById('interests').value = (user.areaOfInterest || []).join(', ');
+                        } else {
                             document.getElementById('workingField').value = user.workingField || '';
                             document.getElementById('companyName').value = user.companyName || '';
                         }
@@ -333,11 +362,20 @@
 
                 const updateData = {
                     fullName: document.getElementById('fullName').value,
+                    profession: document.getElementById('profession').value,
                     major: document.getElementById('major').value,
-                    graduationYear: document.getElementById('graduationYear').value,                    batch: document.getElementById('batch').value,
-                    workingField: document.getElementById('workingField').value,
-                    companyName: document.getElementById('companyName').value,                    bio: document.getElementById('bio').value,
+                    graduationYear: document.getElementById('graduationYear').value,
+                    batch: document.getElementById('batch').value,
+                    bio: document.getElementById('bio').value,
                 };
+
+                if (userType === 'student') {
+                    updateData.department = document.getElementById('department').value;
+                    updateData.areaOfInterest = document.getElementById('interests').value.split(',').map(item => item.trim()).filter(Boolean);
+                } else {
+                    updateData.workingField = document.getElementById('workingField').value;
+                    updateData.companyName = document.getElementById('companyName').value;
+                }
 
                 // Only include password if a new one was entered
                 if (newPassword) {

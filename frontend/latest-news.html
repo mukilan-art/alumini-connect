@@ -134,6 +134,18 @@
 
         .timestamp { color: #95a5a6; }
 
+        .shared-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e8f4ff;
+            color: #1d4ed8;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
         .news-card h3 { font-size: 1.4rem; margin-bottom: 10px; color: var(--primary-dark); }
         .news-card p { line-height: 1.6; color: #576574; margin-bottom: 15px; }
 
@@ -175,6 +187,7 @@
             <h1>Latest Updates</h1>
             <div class="filter-options">
                 <button class="filter-btn active" onclick="filterFeed('all')">All</button>
+                <button class="filter-btn" onclick="filterFeed('post')">📝 Alumni Posts</button>
                 <button class="filter-btn" onclick="filterFeed('news')">📰 News</button>
                 <button class="filter-btn" onclick="filterFeed('jobs')">💼 Job Posts</button>
             </div>
@@ -188,7 +201,12 @@
     <script src="config.js"></script>
     <script>
         let allFeeds = [];
-        const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+        let API_URL = "http://localhost:5000";
+
+        // Initialize backend URL
+        async function initBackendUrl() {
+            API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : await resolveBackendUrl();
+        }
 
         // Check authentication and determine user type
         function checkAuth() {
@@ -218,8 +236,42 @@
 
             try {
                 const token = localStorage.getItem('token');
-                if (!token) {
+                const userId = localStorage.getItem('userId');
+                if (!token || !userId) {
                     throw new Error('No authentication token found');
+                }
+
+                // Fetch posts from connected alumni
+                try {
+                    const postsResponse = await fetch(`${API_URL}/api/posts/connections/${userId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (postsResponse.ok) {
+                        const postsData = await postsResponse.json();
+                        postsData.forEach(post => {
+                            allFeeds.push({
+                                type: 'post',
+                                category: post.category || 'General Update',
+                                title: post.title,
+                                content: post.content,
+                                author: post.authorId?.fullName || 'Unknown',
+                                authorProfession: post.authorId?.profession || '',
+                                createdAt: post.createdAt,
+                                id: post._id,
+                                domain: post.domain,
+                                location: post.location,
+                                applyLink: post.applyLink,
+                                eventDate: post.eventDate
+                            });
+                        });
+                    }
+                } catch (err) {
+                    console.warn('Could not fetch posts:', err);
                 }
 
                 // Fetch news from connected alumni only (filtered by backend)
@@ -262,15 +314,17 @@
                     jobsData.forEach(job => {
                         allFeeds.push({
                             type: 'jobs',
-                            category: 'Career',
+                            category: job.category || 'Career',
                             title: job.title,
                             content: job.description,
-                            author: job.postedBy || 'Alumni',
+                            author: job.postedBy?.fullName || 'Alumni',
+                            authorProfession: job.postedBy?.profession || '',
                             createdAt: job.createdAt,
                             id: job._id,
                             company: job.company,
                             location: job.location,
-                            salary: job.salary
+                            domain: job.domain,
+                            eventDate: job.eventDate
                         });
                     });
                 }
@@ -313,25 +367,39 @@
                 let categoryDisplay = feed.category;
                 let extraContent = '';
 
-                if (feed.type === 'jobs') {
+                if (feed.type === 'post') {
+                    cardClass = 'news-card post-card';
+                    categoryDisplay = '📝 ' + feed.category;
+                    extraContent = `
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                            ${feed.domain ? `<p style="margin: 8px 0;"><strong>Domain:</strong> ${feed.domain}</p>` : ''}
+                            ${feed.location ? `<p style="margin: 8px 0;"><strong>Location:</strong> ${feed.location}</p>` : ''}
+                            ${feed.applyLink ? `<p style="margin: 8px 0;"><a href="${feed.applyLink}" target="_blank" style="color: #3498db; text-decoration: none;"><strong>Apply/Learn More →</strong></a></p>` : ''}
+                            ${feed.eventDate ? `<p style="margin: 8px 0;"><strong>Date:</strong> ${new Date(feed.eventDate).toLocaleString()}</p>` : ''}
+                        </div>
+                    `;
+                } else if (feed.type === 'jobs') {
                     cardClass = 'news-card job-card';
                     categoryDisplay = '💼 ' + feed.category;
                     extraContent = `
                         <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
                             <p style="margin: 8px 0;"><strong>Company:</strong> ${feed.company || 'N/A'}</p>
                             <p style="margin: 8px 0;"><strong>Location:</strong> ${feed.location || 'N/A'}</p>
-                            ${feed.salary ? `<p class="job-salary">💰 ${feed.salary}</p>` : ''}
+                            ${feed.domain ? `<p style="margin: 8px 0;"><strong>Domain:</strong> ${feed.domain}</p>` : ''}
+                            ${feed.eventDate ? `<p style="margin: 8px 0;"><strong>When:</strong> ${new Date(feed.eventDate).toLocaleString()}</p>` : ''}
                         </div>
                     `;
                 } else {
                     categoryDisplay = feed.category;
                 }
 
-                const categoryClass = `tag-${feed.type === 'jobs' ? 'career' : feed.category?.toLowerCase() || 'update'}`;
+                const sharedBadge = `<span class="shared-badge">📢 Alumni Share</span>`;
+                const categoryClass = feed.type === 'jobs' ? 'tag-job' : (feed.type === 'post' ? 'tag-post' : `tag-${feed.category?.toLowerCase() || 'update'}`);
 
                 feedContainer.innerHTML += `
                     <div class="${cardClass}">
                         <div class="card-meta">
+                            ${sharedBadge}
                             <span class="tag ${categoryClass}">${categoryDisplay}</span>
                             <span class="timestamp">${postDate}</span>
                         </div>
@@ -364,7 +432,8 @@
         }
 
         // Initialize on load
-        window.addEventListener('load', function() {
+        window.addEventListener('load', async function() {
+            await initBackendUrl();
             checkAuth();
             loadFeeds();
         });

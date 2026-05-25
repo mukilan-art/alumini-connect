@@ -156,8 +156,29 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="domain">Domain / Industry</label>
+                        <input type="text" id="domain" placeholder="e.g. Web Development, Data Science" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Post Category</label>
+                        <select id="category" onchange="toggleEventFields()">
+                            <option value="Job Vacancy">Job Vacancy</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Workshop / Event">Workshop / Event</option>
+                            <option value="Career Opportunity">Career Opportunity</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label for="location">Location</label>
                         <input type="text" id="location" placeholder="e.g. Remote / New York" required>
+                    </div>
+
+                    <div class="form-group full-width" id="eventDateGroup" style="display:none;">
+                        <label for="eventDate">Event Date & Time</label>
+                        <input type="datetime-local" id="eventDate">
                     </div>
 
                     <div class="form-group">
@@ -189,6 +210,12 @@
 
     <script src="config.js"></script>
     <script>
+        function toggleEventFields() {
+            const category = document.getElementById('category').value;
+            const eventDateGroup = document.getElementById('eventDateGroup');
+            eventDateGroup.style.display = category === 'Workshop / Event' ? 'block' : 'none';
+        }
+
         document.getElementById('jobPostingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -198,7 +225,10 @@
             const jobData = {
                 title: document.getElementById('title').value,
                 company: document.getElementById('company').value,
+                domain: document.getElementById('domain').value,
+                category: document.getElementById('category').value,
                 location: document.getElementById('location').value,
+                eventDate: document.getElementById('eventDate').value || undefined,
                 type: document.getElementById('type').value,
                 description: document.getElementById('description').value,
                 applyLink: document.getElementById('applyLink').value,
@@ -216,7 +246,7 @@
                     status.style.display = "block";
                     status.style.backgroundColor = "#d4edda";
                     status.style.color = "#155724";
-                    status.innerText = "Job posted successfully!";
+                    status.innerText = "Post published successfully!";
                     setTimeout(() => window.location.href = 'alumni-dashboard.html', 2000);
                 } else {
                     throw new Error("Failed to post");

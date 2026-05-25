@@ -331,6 +331,11 @@
                 <button class="filter-btn" data-category="Industry News">Industry News</button>
                 <button class="filter-btn" data-category="Mentorship Tips">Mentorship Tips</button>
                 <button class="filter-btn" data-category="Event Announcement">Events</button>
+                <button class="filter-btn" data-category="Job Vacancy">Job Vacancy</button>
+                <button class="filter-btn" data-category="Internship">Internship</button>
+                <button class="filter-btn" data-category="Workshop / Event">Workshop</button>
+                <button class="filter-btn" data-category="Career Opportunity">Career Opportunity</button>
+                <button class="filter-btn" data-category="Other">Other</button>
             </div>
 
             <div id="errorContainer"></div>
@@ -370,7 +375,7 @@
         });
 
         async function loadPosts(userId, token) {
-            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : "http://localhost:5000";
+            const API_URL = (typeof BACKEND_URL !== 'undefined') ? BACKEND_URL : await resolveBackendUrl();
             
             try {
                 const response = await fetch(`${API_URL}/api/posts/connections/${userId}`, {
@@ -446,6 +451,10 @@
                         </div>
                     </div>
                     <h3 class="post-title">${escapeHtml(post.title)}</h3>
+                    ${post.domain ? `<p class="post-content"><strong>Domain:</strong> ${escapeHtml(post.domain)}</p>` : ''}
+                    ${post.location ? `<p class="post-content"><strong>Location:</strong> ${escapeHtml(post.location)}</p>` : ''}
+                    ${post.applyLink ? `<p class="post-content"><strong>Apply / Join:</strong> <a href="${escapeHtml(post.applyLink)}" target="_blank" style="color:#2563eb; text-decoration: underline;">${escapeHtml(post.applyLink)}</a></p>` : ''}
+                    ${post.eventDate ? `<p class="post-content"><strong>Event Time:</strong> ${new Date(post.eventDate).toLocaleString()}</p>` : ''}
                     <p class="post-content">${escapeHtml(post.content)}</p>
                     ${post.content.length > 300 ? '<button class="view-more-btn">View More</button>' : ''}
                 </div>

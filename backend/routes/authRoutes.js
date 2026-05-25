@@ -39,7 +39,7 @@ router.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ message: 'Invalid credentials.' });
 
-        const token = jwt.sign({ userId: user._id.toString(), userType: user.userType }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id.toString(), userType: user.userType }, JWT_SECRET, { expiresIn: '24h' });
         res.json({ token, userType: user.userType, userId: user._id.toString() }); // Include userId for client use
     } catch (error) {
         console.error('Unified Login Error:', error);
@@ -87,7 +87,7 @@ router.post('/register', async (req, res) => {
 
         const newUser = await User.create(registrationData);
 
-        const token = jwt.sign({ userId: newUser._id.toString(), userType }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: newUser._id.toString(), userType }, JWT_SECRET, { expiresIn: '24h' });
         res.status(201).json({ token, userType, userId: newUser._id.toString() }); 
     } catch (error) {
         // ENHANCED ERROR REPORTING (This is critical for debugging the Mongoose model)
@@ -109,25 +109,33 @@ router.post('/register', async (req, res) => {
 // ===================================
 router.get('/alumni/search', authenticateToken, async (req, res) => {
     try {
-        const { keyword, major, graduationYear } = req.query;
+        const { name, batch, field, keyword, major, graduationYear } = req.query;
         
         // Build search filter
         const filter = { userType: 'alumni' };
-        
-        if (keyword) {
-            const regex = new RegExp(keyword, 'i');
-            filter.$or = [
-                { fullName: regex },
+
+        if (name || keyword) {
+            const queryValue = name || keyword;
+            const regex = new RegExp(queryValue, 'i');
+            filter.fullName = regex;
+        }
+
+        if (field || major) {
+            const queryValue = field || major;
+            const regex = new RegExp(queryValue, 'i');
+            filter.$or = filter.$or || [];
+            filter.$or.push(
+                { workingField: regex },
                 { profession: regex },
-                { email: regex }
-            ];
+                { major: regex }
+            );
         }
-        
-        if (major) {
-            const majorRegex = new RegExp(major, 'i');
-            filter.major = majorRegex;
+
+        if (batch) {
+            const batchRegex = new RegExp(batch, 'i');
+            filter.batch = batchRegex;
         }
-        
+
         if (graduationYear) {
             filter.graduationYear = parseInt(graduationYear);
         }

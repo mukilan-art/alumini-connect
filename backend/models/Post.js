@@ -19,8 +19,25 @@ const PostSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ['Career Advice', 'Industry News', 'Mentorship Tips', 'General Update', 'Event Announcement'],
+        enum: ['General Update', 'Career Advice', 'Industry News', 'Mentorship Tips', 'Event Announcement', 'Job Vacancy', 'Internship', 'Workshop / Event', 'Career Opportunity', 'Other'],
         default: 'General Update'
+    },
+    domain: {
+        type: String,
+        trim: true,
+        maxlength: [100, 'Domain cannot exceed 100 characters']
+    },
+    location: {
+        type: String,
+        trim: true,
+        maxlength: [200, 'Location cannot exceed 200 characters']
+    },
+    applyLink: {
+        type: String,
+        trim: true
+    },
+    eventDate: {
+        type: Date
     },
     createdAt: {
         type: Date,

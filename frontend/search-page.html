@@ -39,7 +39,7 @@
                     🏠 Dashboard
                 </a>
                 <a href="#" class="sidebar-link block py-3 px-4 rounded-lg bg-blue-700 font-semibold">
-                    🔍 Search Alumni
+                    🔍 Find Mentors
                 </a>
                 <a href="edit-profile.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
                     👤 Edit Profile
@@ -61,38 +61,38 @@
 
         <main class="flex-1 ml-64 p-8">
             <div class="bg-white p-10 rounded-xl shadow-lg">
-                <h1 class="text-3xl font-bold text-gray-800 border-b pb-4 mb-6">Search Alumni Directory</h1>
+                <h1 class="text-3xl font-bold text-gray-800 border-b pb-4 mb-6">Find Mentorship from Alumni</h1>
 
                 <form id="searchForm" class="grid grid-cols-1 md:grid-cols-4 gap-6 p-4 border border-blue-100 rounded-lg bg-blue-50 mb-8">
                     <div class="md:col-span-2 input-group">
-                        <label for="keyword" class="block text-sm">Name or Keyword</label>
+                        <label for="name" class="block text-sm">Name</label>
                         <input
                             type="text"
-                            id="keyword"
-                            name="keyword"
-                            placeholder="e.g., John Smith, Software Engineer"
+                            id="name"
+                            name="name"
+                            placeholder="e.g., John Smith"
                             class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700"
                         >
                     </div>
 
                     <div class="input-group">
-                        <label for="major" class="block text-sm">Major / Department</label>
+                        <label for="batch" class="block text-sm">Batch</label>
                         <input
                             type="text"
-                            id="major"
-                            name="major"
-                            placeholder="e.g., Computer Science"
+                            id="batch"
+                            name="batch"
+                            placeholder="e.g., Batch of 2020"
                             class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700"
                         >
                     </div>
 
                     <div class="input-group">
-                        <label for="graduationYear" class="block text-sm">Graduation Year</label>
+                        <label for="field" class="block text-sm">Field</label>
                         <input
-                            type="number"
-                            id="graduationYear"
-                            name="graduationYear"
-                            placeholder="e.g., 2018"
+                            type="text"
+                            id="field"
+                            name="field"
+                            placeholder="e.g., Software Engineering"
                             class="w-full p-3 border border-gray-300 rounded-lg mt-1 focus:ring-blue-500 focus:border-blue-500 text-gray-700"
                         >
                     </div>
@@ -113,7 +113,7 @@
                             type="submit"
                             class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300 shadow-md flex items-center space-x-2"
                         >
-                            <span>Search Alumni</span>
+                            <span>Search Mentors</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path
                                     fill-rule="evenodd"
@@ -126,7 +126,7 @@
                 </form>
 
                 <div class="mt-8">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4" id="resultsHeader">Search Results (0 found)</h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4" id="resultsHeader">Mentor Search Results (0 found)</h2>
                     <div id="resultsContainer" class="space-y-4">
                         <p id="noResults" class="text-gray-500 hidden">
                             Please enter search criteria and click 'Search Alumni' to find matches.
@@ -236,16 +236,16 @@
                 resultsContainer.innerHTML = '<p class="text-blue-500 font-medium">Searching...</p>';
                 resultsHeader.textContent = 'Searching...';
 
-                const keyword = document.getElementById('keyword').value;
-                const major = document.getElementById('major').value;
-                const graduationYear = document.getElementById('graduationYear').value;
+                const name = document.getElementById('name').value;
+                const batch = document.getElementById('batch').value;
+                const field = document.getElementById('field').value;
                 const location = document.getElementById('location').value;
 
                 const queryParams = new URLSearchParams();
-                if (keyword) queryParams.append('keyword', keyword);
-                if (major) queryParams.append('major', major);
-                if (graduationYear) queryParams.append('graduationYear', graduationYear);
-                // if (location) queryParams.append('location', location);
+                if (name) queryParams.append('name', name);
+                if (batch) queryParams.append('batch', batch);
+                if (field) queryParams.append('field', field);
+                if (location) queryParams.append('location', location);
 
                 try {
                     const response = await fetch(`${BACKEND_URL}/api/alumni/search?${queryParams.toString()}`, {

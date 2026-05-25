@@ -51,6 +51,23 @@
             padding-left: 13px !important;
         }
 
+        .latest-news-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: #fb923c;
+            box-shadow: 0 0 0 4px rgba(251,146,60,0.15);
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .latest-news-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
         aside .p-4:last-of-type {
             padding: 16px 16px !important;
             border-top: 2px solid rgba(255,255,255,0.1);
@@ -169,17 +186,20 @@
                 <a href="chat.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
                     💬 Messages
                 </a>
-                <a href="view-mentorship.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                <a href="search-page.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
                     🎓 Find Mentors
+                </a>
+                <a href="view-mentorship-offers.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    📬 Mentorship Offers
                 </a>
                 <a href="student-connections.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
                     🔗 Alumni Connections
                 </a>
-                <a href="latest-news.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
-                    📰 Latest News
-                </a>
-                <a href="view-jobs.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
-                    💼 Job Postings
+                <a href="latest-news.html" id="latestNewsLink" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
+                    <span class="latest-news-label">
+                        <span>📰 Latest News</span>
+                        <span id="latestNewsDot" class="latest-news-dot"></span>
+                    </span>
                 </a>
                 <a href="edit-profile.html" class="sidebar-link block py-3 px-4 rounded-lg font-medium">
                     ✏️ Edit Profile
@@ -356,8 +376,7 @@
                 }
             } catch (err) {
                 console.error('Error loading student profile:', err);
-                // On failure, clear session and redirect to login
-                localStorage.clear();
+                // On failure, redirect to login (token might be expired)
                 window.location.href = 'studentlogin.html';
                 return;
             }
@@ -575,6 +594,13 @@
             if (!notifCountStudent) return;
             if (count && count > 0) { notifCountStudent.style.display = 'inline-block'; notifCountStudent.textContent = count; }
             else { notifCountStudent.style.display = 'none'; }
+            updateLatestNewsDot(count);
+        }
+
+        function updateLatestNewsDot(count) {
+            const latestNewsDot = document.getElementById('latestNewsDot');
+            if (!latestNewsDot) return;
+            latestNewsDot.style.display = (count && count > 0) ? 'inline-block' : 'none';
         }
 
         async function fetchNotificationsStudent() {

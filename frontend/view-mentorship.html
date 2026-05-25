@@ -21,8 +21,8 @@
 </head>
 <body>
     <div class="card">
-        <a href="manage-mentorship.html" class="btn btn-back" style="text-decoration:none;display:inline-block;margin-bottom:12px">← Back to list</a>
-        <h1>Mentorship Request</h1>
+        <a id="backLink" class="btn btn-back" style="text-decoration:none;display:inline-block;margin-bottom:12px">← Back</a>
+        <h1 id="pageTitle">Mentorship Request</h1>
         <div id="content">
             <p class="meta">Loading request...</p>
         </div>
@@ -40,29 +40,91 @@
             return params.get(name);
         }
 
+        function redirectToLogin() {
+            const userType = localStorage.getItem('userType');
+            if (userType === 'alumni') {
+                window.location.href = 'alumnilogin.html';
+            } else {
+                window.location.href = 'studentlogin.html';
+            }
+        }
+
         async function loadRequest() {
+            const token = localStorage.getItem('token');
+            const userId = String(localStorage.getItem('userId') || '');
+            const userType = localStorage.getItem('userType');
             const id = getQueryParam('id');
             const content = document.getElementById('content');
             const controls = document.getElementById('controls');
-            if (!id) { content.innerHTML = '<p class="meta">No request id provided.</p>'; return; }
+
+            if (!token || !userId || !userType || (userType !== 'student' && userType !== 'alumni')) {
+                return redirectToLogin();
+            }
+
+            if (!id) {
+                content.innerHTML = '<p class="meta">No request id provided.</p>';
+                return;
+            }
 
             try {
                 const res = await fetch(`${API_URL}/api/mentorship/${id}`);
-                if (!res.ok) { content.innerHTML = `<p class="meta">Failed to load request (${res.status}).</p>`; return; }
+                if (!res.ok) {
+                    content.innerHTML = `<p class="meta">Failed to load request (${res.status}).</p>`;
+                    return;
+                }
+
                 const req = await res.json();
+                const reqStudentId = String(req.studentId || '');
+                const reqAlumniId = String(req.alumniId || '');
+                const isStudent = userId === reqStudentId;
+                const isAlumni = userId === reqAlumniId;
 
                 const created = new Date(req.createdAt).toLocaleString();
+                const backLink = document.getElementById('backLink');
+                const pageTitle = document.getElementById('pageTitle');
+                let displayName = '';
+                let requestType = '';
+                let backHref = 'manage-mentorship.html';
+                let backText = '← Back to requests';
+
+                if (isStudent) {
+                    displayName = req.alumniName || 'Alumni';
+                    requestType = 'Mentorship Offer from:';
+                    backHref = 'view-mentorship-offers.html';
+                    backText = '← Back to offers';
+                    if (pageTitle) pageTitle.textContent = 'Mentorship Offer';
+                } else if (isAlumni) {
+                    displayName = req.studentName;
+                    requestType = 'Request from:';
+                    backHref = 'manage-mentorship.html';
+                    backText = '← Back to requests';
+                    if (pageTitle) pageTitle.textContent = 'Mentorship Request';
+                } else {
+                    displayName = req.studentName || req.alumniName || 'User';
+                    if (pageTitle) pageTitle.textContent = 'Mentorship Details';
+                }
+
+                if (backLink) {
+                    backLink.href = backHref;
+                    backLink.textContent = backText;
+                }
+
                 content.innerHTML = `
                     <p class="meta">Requested on: ${created}</p>
-                    <h2>${req.studentName}</h2>
+                    <p class="meta">${requestType}</p>
+                    <h2>${displayName}</h2>
                     <p class="topic">Topic: ${req.subject}</p>
                     <p style="margin-top:12px">${req.message}</p>
                     <p style="margin-top:16px"><strong>Status:</strong> <span id="status">${req.status}</span></p>
                 `;
 
-                controls.style.display = 'flex';
-                document.getElementById('acceptBtn').onclick = () => updateStatus(id, 'Accepted');
-                document.getElementById('declineBtn').onclick = () => updateStatus(id, 'Declined');
+                if (req.status === 'Pending' && (isStudent || isAlumni)) {
+                    controls.style.display = 'flex';
+                    document.getElementById('acceptBtn').onclick = () => updateStatus(id, 'Accepted');
+                    document.getElementById('declineBtn').onclick = () => updateStatus(id, 'Declined');
+                } else {
+                    controls.style.display = 'none';
+                }
             } catch (err) {
                 content.innerHTML = '<p class="meta">Error loading request.</p>';
             }

@@ -1,8 +1,16 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const router = express.Router();
+
 // Job Schema
 const jobSchema = new mongoose.Schema({
     title: String,
     company: String,
+    domain: String,
+    category: { type: String, enum: ['Job Vacancy', 'Internship', 'Workshop / Event', 'Career Opportunity', 'Other'], default: 'Job Vacancy' },
     location: String,
+    type: String,
+    eventDate: Date,
     description: String,
     applyLink: String,
     postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to the Alumni
@@ -11,11 +19,41 @@ const jobSchema = new mongoose.Schema({
 
 const Job = mongoose.model('Job', jobSchema);
 
-// API Route to Post a Job
-app.post('/api/jobs', async (req, res) => {
+// API Route to fetch all jobs
+router.get('/jobs', async (req, res) => {
     try {
-        const { title, company, location, description, applyLink, userId } = req.body;
-        const newJob = new Job({ title, company, location, description, applyLink, postedBy: userId });
+        const jobs = await Job.find().sort({ createdAt: -1 }).populate('postedBy', 'fullName profession companyName');
+        res.json(jobs);
+    } catch (err) {
+        console.error('Error fetching jobs:', err);
+        res.status(500).json({ message: 'Error fetching jobs.' });
+    }
+});
+
+// API Route to Post a Job
+router.post('/jobs', async (req, res) => {
+    try {
+        const { title, company, domain, category, location, type, eventDate, description, applyLink, userId } = req.body;
+        const jobPayload = {
+            title,
+            company,
+            domain,
+            category: category || 'Job Vacancy',
+            location,
+            type,
+            description,
+            applyLink,
+            postedBy: userId
+        };
+
+        if (eventDate) {
+            const dateValue = new Date(eventDate);
+            if (!isNaN(dateValue.getTime())) {
+                jobPayload.eventDate = dateValue;
+            }
+        }
+
+        const newJob = new Job(jobPayload);
         await newJob.save();
 
         // Create notifications for all students (non-blocking but we will attempt it)
@@ -38,8 +76,11 @@ app.post('/api/jobs', async (req, res) => {
             // Do not fail the job posting request if notification creation fails
         }
 
-        res.status(201).json({ message: "Job posted successfully!" });
+        res.status(201).json({ message: 'Job posted successfully!' });
     } catch (err) {
-        res.status(500).json({ message: "Error posting job" });
+        console.error('Error posting job:', err);
+        res.status(500).json({ message: 'Error posting job' });
     }
 });
+
+module.exports = { router };

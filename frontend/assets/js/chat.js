@@ -38,11 +38,21 @@
   function renderMessages(container, messages, senderName){
     console.log('renderMessages called, count=', messages && messages.length);
     container.innerHTML = '';
+    if (!messages || messages.length === 0) {
+      container.innerHTML = `
+        <div class="conversation-placeholder">
+          <h4>No messages yet</h4>
+          <p>Send the first message to start a thoughtful, professional conversation.</p>
+        </div>
+      `;
+      container.scrollTop = container.scrollHeight;
+      return;
+    }
+
     messages.forEach(m => {
       const cls = (String(m.from._id || m.from) === String(currentUserId)) ? 'chat-msg-sent' : 'chat-msg-recv';
       const el = document.createElement('div');
       el.className = 'chat-msg '+cls;
-      // store message id for later actions
       if (m._id) el.dataset.messageId = m._id;
 
       let html = '';
@@ -52,9 +62,7 @@
       html += `<div class="chat-text">${escapeHtml(m.text)}</div><div class="chat-meta">${formatTime(m.createdAt)}</div>`;
       el.innerHTML = html;
 
-      // click handler for deletion options
       el.addEventListener('click', () => handleMessageClick(m));
-
       container.appendChild(el);
     });
     container.scrollTop = container.scrollHeight;
@@ -204,9 +212,11 @@
     const convId = conversationIdFor(currentUserId, partnerId);
     window.__currentConversationId = convId;
     window.__currentConversationName = partnerName || 'Chat';
-    // show chat box if available
+    const titleEl = document.getElementById('chat-title');
+    const subtitleEl = document.getElementById('chat-subtitle');
+    if (titleEl) titleEl.textContent = partnerName || 'Conversation';
+    if (subtitleEl) subtitleEl.textContent = partnerName ? `Professional conversation with ${partnerName}` : 'Select a contact to begin.';
     const box = document.getElementById('chat-box'); if (box) box.style.display = 'block';
-    // load the conversation UI (messages + join room)
     try { await loadConversationUI(convId, partnerId); } catch(e){ console.error('initChatWith load failed', e); }
   };
 

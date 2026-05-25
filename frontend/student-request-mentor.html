@@ -4,6 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="config.js"></script>
+    <script>
+        // Early authentication check - runs BEFORE page loads
+        (function() {
+            const token = localStorage.getItem('token');
+            const userType = localStorage.getItem('userType');
+            const userId = localStorage.getItem('userId');
+
+            // Redirect immediately if not logged in
+            if (!token || !userId) {
+                window.location.href = 'studentlogin.html';
+                return;
+            }
+
+            // If logged in as alumni, send to alumni dashboard
+            if (userType === 'alumni') {
+                localStorage.clear();
+                window.location.href = 'alumnilogin.html';
+                return;
+            }
+
+            // If userType is missing or not student, go to student login
+            if (userType !== 'student') {
+                localStorage.clear();
+                window.location.href = 'studentlogin.html';
+                return;
+            }
+        })();
+    </script>
     <title>Request Mentorship | Alumni Connect</title>
     <style>
         :root { 
@@ -44,7 +72,7 @@
 <body>
     <div class="container">
         <div class="card">
-            <a href="student-dashboard.html" class="back-link">← Back to Dashboard</a>
+            <a href="#" class="back-link" onclick="goBack(event)">← Back to Dashboard</a>
             <h2>Request Mentorship</h2>
             <p class="subtitle">Connect with an alumnus for guidance and mentorship</p>
 
@@ -192,6 +220,15 @@
                 document.getElementById('alumniError').textContent = 'Error sending request';
             }
         });
+
+        function goBack(event) {
+            event.preventDefault();
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'student-dashboard.html';
+            }
+        }
     </script>
 </body>
 </html>
